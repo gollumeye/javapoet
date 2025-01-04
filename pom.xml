@@ -98,8 +98,8 @@
         <configuration>
           <compilerId>javac-with-errorprone</compilerId>
           <forceJavacCompilerUse>true</forceJavacCompilerUse>
-          <source>${java.version}</source>
-          <target>${java.version}</target>
+          <source>8</source>
+          <target>8</target>
         </configuration>
         <dependencies>
           <dependency>
