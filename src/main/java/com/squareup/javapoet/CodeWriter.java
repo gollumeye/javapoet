@@ -353,7 +353,7 @@ final class CodeWriter {
     return false;
   }
 
-  private void emitLiteral(Object o) throws IOException {
+  void emitLiteral(Object o) throws IOException {
     if (o instanceof TypeSpec) {
       TypeSpec typeSpec = (TypeSpec) o;
       typeSpec.emit(this, null, Collections.emptySet());
