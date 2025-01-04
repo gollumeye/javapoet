@@ -15,8 +15,6 @@
  */
 package com.squareup.javapoet;
 
-import com.squareup.javapoet.CodeWriter.CodeWriter;
-
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
@@ -54,7 +52,7 @@ public final class AnnotationSpec {
     this.members = Util.immutableMultimap(builder.members);
   }
 
-  public void emit(CodeWriter codeWriter, boolean inline) throws IOException {
+  void emit(CodeWriter codeWriter, boolean inline) throws IOException {
     String whitespace = inline ? "" : "\n";
     String memberSeparator = inline ? ", " : ",\n";
     if (members.isEmpty()) {
@@ -89,7 +87,7 @@ public final class AnnotationSpec {
   }
 
   private void emitAnnotationValues(CodeWriter codeWriter, String whitespace,
-                                    String memberSeparator, List<CodeBlock> values) throws IOException {
+      String memberSeparator, List<CodeBlock> values) throws IOException {
     if (values.size() == 1) {
       codeWriter.indent(2);
       codeWriter.emit(values.get(0));

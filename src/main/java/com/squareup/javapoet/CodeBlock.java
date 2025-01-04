@@ -15,8 +15,6 @@
  */
 package com.squareup.javapoet;
 
-import com.squareup.javapoet.CodeWriter.CodeWriter;
-
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -70,8 +68,8 @@ public final class CodeBlock {
   private static final Pattern LOWERCASE = Pattern.compile("[a-z]+[\\w_]*");
 
   /** A heterogeneous list containing string literals and value placeholders. */
-  public final List<String> formatParts;
-  public final List<Object> args;
+  final List<String> formatParts;
+  final List<Object> args;
 
   private CodeBlock(Builder builder) {
     this.formatParts = Util.immutableList(builder.formatParts);

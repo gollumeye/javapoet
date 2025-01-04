@@ -15,8 +15,6 @@
  */
 package com.squareup.javapoet;
 
-import com.squareup.javapoet.CodeWriter.CodeWriter;
-
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
@@ -66,8 +64,7 @@ public final class ParameterizedTypeName extends TypeName {
         enclosingType, rawType.withoutAnnotations(), typeArguments, new ArrayList<>());
   }
 
-  @Override
-  public CodeWriter emit(CodeWriter out) throws IOException {
+  @Override CodeWriter emit(CodeWriter out) throws IOException {
     if (enclosingType != null) {
       enclosingType.emit(out);
       out.emit(".");

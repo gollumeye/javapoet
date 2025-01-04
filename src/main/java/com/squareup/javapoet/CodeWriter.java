@@ -13,10 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.squareup.javapoet.CodeWriter;
-
-import com.squareup.javapoet.*;
-
+package com.squareup.javapoet;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,7 +41,7 @@ import static java.lang.String.join;
  * Converts a {@link JavaFile} to a string suitable to both human- and javac-consumption. This
  * honors imports, indentation, and deferred variable names.
  */
-public final class CodeWriter {
+final class CodeWriter {
   /** Sentinel value that indicates that no user-provided package has been set. */
   private static final String NO_PACKAGE = new String();
   private static final Pattern LINE_BREAKING_PATTERN = Pattern.compile("\\R");
@@ -71,21 +68,21 @@ public final class CodeWriter {
    * line of a statement is indented normally and subsequent wrapped lines are double-indented. This
    * is -1 when the currently-written line isn't part of a statement.
    */
-  public int statementLine = -1;
+  int statementLine = -1;
 
-  public CodeWriter(Appendable out) {
+  CodeWriter(Appendable out) {
     this(out, "  ", Collections.emptySet(), Collections.emptySet());
   }
 
-  public CodeWriter(Appendable out, String indent, Set<String> staticImports, Set<String> alwaysQualify) {
+  CodeWriter(Appendable out, String indent, Set<String> staticImports, Set<String> alwaysQualify) {
     this(out, indent, Collections.emptyMap(), staticImports, alwaysQualify);
   }
 
-  public CodeWriter(Appendable out,
-                    String indent,
-                    Map<String, ClassName> importedTypes,
-                    Set<String> staticImports,
-                    Set<String> alwaysQualify) {
+  CodeWriter(Appendable out,
+      String indent,
+      Map<String, ClassName> importedTypes,
+      Set<String> staticImports,
+      Set<String> alwaysQualify) {
     this.out = new LineWrapper(out, indent, 100);
     this.indent = checkNotNull(indent, "indent == null");
     this.importedTypes = checkNotNull(importedTypes, "importedTypes == null");
@@ -356,7 +353,7 @@ public final class CodeWriter {
     return false;
   }
 
-  public void emitLiteral(Object o) throws IOException {
+  void emitLiteral(Object o) throws IOException {
     if (o instanceof TypeSpec) {
       TypeSpec typeSpec = (TypeSpec) o;
       typeSpec.emit(this, null, Collections.emptySet());
@@ -376,7 +373,7 @@ public final class CodeWriter {
    * available imports and the current scope to find the shortest name available. It does not honor
    * names visible due to inheritance.
    */
-  public String lookupName(ClassName className) {
+  String lookupName(ClassName className) {
     // If the top level simple name is masked by a current type variable, use the canonical name.
     String topLevelSimpleName = className.topLevelClassName().simpleName();
     if (currentTypeVariables.contains(topLevelSimpleName)) {
@@ -472,7 +469,7 @@ public final class CodeWriter {
    * {@link #out} does it through here, since we emit indentation lazily in order to avoid
    * unnecessary trailing whitespace.
    */
-  public CodeWriter emitAndIndent(String s) throws IOException {
+  CodeWriter emitAndIndent(String s) throws IOException {
     boolean first = true;
     for (String line : LINE_BREAKING_PATTERN.split(s, -1)) {
       // Emit a newline character. Make sure blank lines in Javadoc & comments look good.
@@ -520,10 +517,31 @@ public final class CodeWriter {
    * Returns the types that should have been imported for this code. If there were any simple name
    * collisions, that type's first use is imported.
    */
-  public Map<String, ClassName> suggestedImports() {
+  Map<String, ClassName> suggestedImports() {
     Map<String, ClassName> result = new LinkedHashMap<>(importableTypes);
     result.keySet().removeAll(referencedNames);
     return result;
   }
 
+  // A makeshift multi-set implementation
+  private static final class Multiset<T> {
+    private final Map<T, Integer> map = new LinkedHashMap<>();
+
+    void add(T t) {
+      int count = map.getOrDefault(t, 0);
+      map.put(t, count + 1);
+    }
+
+    void remove(T t) {
+      int count = map.getOrDefault(t, 0);
+      if (count == 0) {
+        throw new IllegalStateException(t + " is not in the multiset");
+      }
+      map.put(t, count - 1);
+    }
+
+    boolean contains(T t) {
+      return map.getOrDefault(t, 0) > 0;
+    }
+  }
 }

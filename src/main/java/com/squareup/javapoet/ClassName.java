@@ -15,8 +15,6 @@
  */
 package com.squareup.javapoet;
 
-import com.squareup.javapoet.CodeWriter.CodeWriter;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,12 +43,12 @@ public final class ClassName extends TypeName implements Comparable<ClassName> {
   final ClassName enclosingClassName;
 
   /** This class name, like "Entry" for java.util.Map.Entry. */
-  public final String simpleName;
+  final String simpleName;
 
   private List<String> simpleNames;
 
   /** The full class name like "java.util.Map.Entry". */
-  public final String canonicalName;
+  final String canonicalName;
 
   private ClassName(String packageName, ClassName enclosingClassName, String simpleName) {
     this(packageName, enclosingClassName, simpleName, Collections.emptyList());
@@ -253,8 +251,7 @@ public final class ClassName extends TypeName implements Comparable<ClassName> {
     return canonicalName.compareTo(o.canonicalName);
   }
 
-  @Override
-  public CodeWriter emit(CodeWriter out) throws IOException {
+  @Override CodeWriter emit(CodeWriter out) throws IOException {
     boolean charsEmitted = false;
     for (ClassName className : enclosingClasses()) {
       String simpleName;

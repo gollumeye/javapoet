@@ -15,8 +15,6 @@
  */
 package com.squareup.javapoet;
 
-import com.squareup.javapoet.CodeWriter.CodeWriter;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;

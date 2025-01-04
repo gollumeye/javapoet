@@ -15,8 +15,6 @@
  */
 package com.squareup.javapoet;
 
-import com.squareup.javapoet.CodeWriter.CodeWriter;
-
 import java.io.IOException;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
@@ -230,7 +228,7 @@ public class TypeName {
     return result;
   }
 
-  public CodeWriter emit(CodeWriter out) throws IOException {
+  CodeWriter emit(CodeWriter out) throws IOException {
     if (keyword == null) throw new AssertionError();
 
     if (isAnnotated()) {

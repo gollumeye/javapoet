@@ -15,8 +15,6 @@
  */
 package com.squareup.javapoet;
 
-import com.squareup.javapoet.CodeWriter.CodeWriter;
-
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -63,7 +61,7 @@ public final class TypeSpec {
   public final CodeBlock initializerBlock;
   public final List<MethodSpec> methodSpecs;
   public final List<TypeSpec> typeSpecs;
-  public final Set<String> nestedTypesSimpleNames;
+  final Set<String> nestedTypesSimpleNames;
   public final List<Element> originatingElements;
   public final Set<String> alwaysQualifiedNames;
 
@@ -185,7 +183,7 @@ public final class TypeSpec {
     return builder;
   }
 
-  public void emit(CodeWriter codeWriter, String enumName, Set<Modifier> implicitModifiers)
+  void emit(CodeWriter codeWriter, String enumName, Set<Modifier> implicitModifiers)
       throws IOException {
     // Nested classes interrupt wrapped line indentation. Stash the current wrapping state and put
     // it back afterwards when this type is complete.

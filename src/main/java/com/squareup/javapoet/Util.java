@@ -32,7 +32,7 @@ import static java.lang.Character.isISOControl;
  * Like Guava, but worse and standalone. This makes it easier to mix JavaPoet with libraries that
  * bring their own version of Guava.
  */
-public final class Util {
+final class Util {
   private Util() {
   }
 
@@ -49,16 +49,16 @@ public final class Util {
     return Collections.unmodifiableMap(new LinkedHashMap<>(map));
   }
 
-  public static void checkArgument(boolean condition, String format, Object... args) {
+  static void checkArgument(boolean condition, String format, Object... args) {
     if (!condition) throw new IllegalArgumentException(String.format(format, args));
   }
 
-  public static <T> T checkNotNull(T reference, String format, Object... args) {
+  static <T> T checkNotNull(T reference, String format, Object... args) {
     if (reference == null) throw new NullPointerException(String.format(format, args));
     return reference;
   }
 
-  public static void checkState(boolean condition, String format, Object... args) {
+  static void checkState(boolean condition, String format, Object... args) {
     if (!condition) throw new IllegalStateException(String.format(format, args));
   }
 
@@ -103,7 +103,7 @@ public final class Util {
   }
 
   /** Returns the string literal representing {@code value}, including wrapping double quotes. */
-  public static String stringLiteralWithDoubleQuotes(String value, String indent) {
+  static String stringLiteralWithDoubleQuotes(String value, String indent) {
     StringBuilder result = new StringBuilder(value.length() + 2);
     result.append('"');
     for (int i = 0; i < value.length(); i++) {

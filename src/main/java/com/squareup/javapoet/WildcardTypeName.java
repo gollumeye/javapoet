@@ -15,8 +15,6 @@
  */
 package com.squareup.javapoet;
 
-import com.squareup.javapoet.CodeWriter.CodeWriter;
-
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
@@ -63,8 +61,7 @@ public final class WildcardTypeName extends TypeName {
     return new WildcardTypeName(upperBounds, lowerBounds);
   }
 
-  @Override
-  public CodeWriter emit(CodeWriter out) throws IOException {
+  @Override CodeWriter emit(CodeWriter out) throws IOException {
     if (lowerBounds.size() == 1) {
       return out.emit("? super $T", lowerBounds.get(0));
     }
