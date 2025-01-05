@@ -7,31 +7,38 @@ import java.util.Map;
 
 public class DefaultAnnotationFormatter implements AnnotationFormatter {
     @Override
-    public void format(AnnotationSpec annotationSpec, CodeWriter codeWriter, boolean inline) throws IOException {
+    public void format(AnnotationSpec annotationSpec, CodeWriter codeWriter, boolean inline)
+            throws IOException {
         String whitespace = inline ? "" : "\n";
         String memberSeparator = inline ? ", " : ",\n";
 
         if (annotationSpec.members.isEmpty()) {
             codeWriter.emit("@$T", annotationSpec.type);  // No members
-        } else if (annotationSpec.members.size() == 1 && annotationSpec.members.containsKey(AnnotationSpec.VALUE)) {
+        } else if (annotationSpec.members.size() == 1
+                && annotationSpec.members.containsKey(AnnotationSpec.VALUE)) {
             codeWriter.emit("@$T(", annotationSpec.type);  // Single "value" member
-            emitAnnotationValues(codeWriter, whitespace, memberSeparator, annotationSpec.members.get(AnnotationSpec.VALUE));
+            emitAnnotationValues(codeWriter, whitespace, memberSeparator,
+                    annotationSpec.members.get(AnnotationSpec.VALUE));
             codeWriter.emit(")");
         } else {
             codeWriter.emit("@$T(" + whitespace, annotationSpec.type);  // Multiple members
             codeWriter.indent(2);
-            for (Iterator<Map.Entry<String, List<CodeBlock>>> i = annotationSpec.members.entrySet().iterator(); i.hasNext(); ) {
+            for (Iterator<Map.Entry<String, List<CodeBlock>>> i
+                 = annotationSpec.members.entrySet().iterator(); i.hasNext(); ) {
                 Map.Entry<String, List<CodeBlock>> entry = i.next();
                 codeWriter.emit("$L = ", entry.getKey());
                 emitAnnotationValues(codeWriter, whitespace, memberSeparator, entry.getValue());
-                if (i.hasNext()) codeWriter.emit(memberSeparator);
+                if (i.hasNext()) {
+                    codeWriter.emit(memberSeparator);
+                }
             }
             codeWriter.unindent(2);
             codeWriter.emit(whitespace + ")");
         }
     }
 
-    private void emitAnnotationValues(CodeWriter codeWriter, String whitespace, String memberSeparator, List<CodeBlock> values) throws IOException {
+    private void emitAnnotationValues(CodeWriter codeWriter, String whitespace,
+                                String memberSeparator, List<CodeBlock> values) throws IOException {
         if (values.size() == 1) {
             codeWriter.indent(2);
             codeWriter.emit(values.get(0));  // Single value
@@ -41,7 +48,9 @@ public class DefaultAnnotationFormatter implements AnnotationFormatter {
             codeWriter.indent(2);
             boolean first = true;
             for (CodeBlock codeBlock : values) {
-                if (!first) codeWriter.emit(memberSeparator);
+                if (!first) {
+                    codeWriter.emit(memberSeparator);
+                }
                 codeWriter.emit(codeBlock);
                 first = false;
             }

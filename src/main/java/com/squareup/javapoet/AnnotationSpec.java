@@ -22,7 +22,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +50,9 @@ public final class AnnotationSpec {
   private AnnotationSpec(Builder builder) {
     this.type = builder.type;
     this.members = Util.immutableMultimap(builder.members);
-    this.formatter = builder.formatter != null ? builder.formatter : new DefaultAnnotationFormatter();
+    this.formatter = builder.formatter != null
+            ? builder.formatter
+            : new DefaultAnnotationFormatter();
   }
 
   void emit(CodeWriter codeWriter, boolean inline) throws IOException {
