@@ -43,6 +43,7 @@ import static com.squareup.javapoet.Util.checkNotNull;
 /** A generated annotation on a declaration. */
 public final class AnnotationSpec {
   public static final String VALUE = "value";
+  private final AnnotationFormatter formatter;
 
   public final TypeName type;
   public final Map<String, List<CodeBlock>> members;
@@ -50,61 +51,11 @@ public final class AnnotationSpec {
   private AnnotationSpec(Builder builder) {
     this.type = builder.type;
     this.members = Util.immutableMultimap(builder.members);
+    this.formatter = builder.formatter != null ? builder.formatter : new DefaultAnnotationFormatter();
   }
 
   void emit(CodeWriter codeWriter, boolean inline) throws IOException {
-    String whitespace = inline ? "" : "\n";
-    String memberSeparator = inline ? ", " : ",\n";
-    if (members.isEmpty()) {
-      // @Singleton
-      codeWriter.emit("@$T", type);
-    } else if (members.size() == 1 && members.containsKey("value")) {
-      // @Named("foo")
-      codeWriter.emit("@$T(", type);
-      emitAnnotationValues(codeWriter, whitespace, memberSeparator, members.get("value"));
-      codeWriter.emit(")");
-    } else {
-      // Inline:
-      //   @Column(name = "updated_at", nullable = false)
-      //
-      // Not inline:
-      //   @Column(
-      //       name = "updated_at",
-      //       nullable = false
-      //   )
-      codeWriter.emit("@$T(" + whitespace, type);
-      codeWriter.indent(2);
-      for (Iterator<Map.Entry<String, List<CodeBlock>>> i
-          = members.entrySet().iterator(); i.hasNext(); ) {
-        Map.Entry<String, List<CodeBlock>> entry = i.next();
-        codeWriter.emit("$L = ", entry.getKey());
-        emitAnnotationValues(codeWriter, whitespace, memberSeparator, entry.getValue());
-        if (i.hasNext()) codeWriter.emit(memberSeparator);
-      }
-      codeWriter.unindent(2);
-      codeWriter.emit(whitespace + ")");
-    }
-  }
-
-  private void emitAnnotationValues(CodeWriter codeWriter, String whitespace,
-      String memberSeparator, List<CodeBlock> values) throws IOException {
-    if (values.size() == 1) {
-      codeWriter.indent(2);
-      codeWriter.emit(values.get(0));
-      codeWriter.unindent(2);
-      return;
-    }
-
-    codeWriter.emit("{" + whitespace);
-    codeWriter.indent(2);
-    boolean first = true;
-    for (CodeBlock codeBlock : values) {
-      if (!first) codeWriter.emit(memberSeparator);
-      codeWriter.emit(codeBlock);
-      first = false;
-    }
-    codeWriter.unindent(2);
-    codeWriter.emit(whitespace + "}");
+    formatter.format(this, codeWriter, inline);
   }
 
   public static AnnotationSpec get(Annotation annotation) {
@@ -167,6 +118,7 @@ public final class AnnotationSpec {
     for (Map.Entry<String, List<CodeBlock>> entry : members.entrySet()) {
       builder.members.put(entry.getKey(), new ArrayList<>(entry.getValue()));
     }
+    builder.formatter(formatter);
     return builder;
   }
 
@@ -194,8 +146,8 @@ public final class AnnotationSpec {
 
   public static final class Builder {
     private final TypeName type;
-
     public final Map<String, List<CodeBlock>> members = new LinkedHashMap<>();
+    private AnnotationFormatter formatter;
 
     private Builder(TypeName type) {
       this.type = type;
@@ -208,6 +160,11 @@ public final class AnnotationSpec {
     public Builder addMember(String name, CodeBlock codeBlock) {
       List<CodeBlock> values = members.computeIfAbsent(name, k -> new ArrayList<>());
       values.add(codeBlock);
+      return this;
+    }
+
+    public Builder formatter(AnnotationFormatter formatter) {
+      this.formatter = formatter;
       return this;
     }
 
