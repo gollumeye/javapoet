@@ -9,9 +9,19 @@ import java.util.Collections;
 
 public final class AnnotationMemberManager {
     private Map<String, List<CodeBlock>> members = new LinkedHashMap<>();
+    private final List<AnnotationValueHandler.ValueHandler> valueHandlers = new ArrayList<>();
+
 
     public AnnotationMemberManager(Map<String, List<CodeBlock>> members) {
         this.members = members;
+
+        valueHandlers.add(new AnnotationValueHandler.ClassValueHandler());
+        valueHandlers.add(new AnnotationValueHandler.EnumValueHandler());
+        valueHandlers.add(new AnnotationValueHandler.StringValueHandler());
+        valueHandlers.add(new AnnotationValueHandler.FloatValueHandler());
+        valueHandlers.add(new AnnotationValueHandler.LongValueHandler());
+        valueHandlers.add(new AnnotationValueHandler.CharacterValueHandler());
+        valueHandlers.add(new AnnotationValueHandler.DefaultValueHandler());
     }
 
     /**
@@ -35,29 +45,21 @@ public final class AnnotationMemberManager {
      */
     public void addMemberForValue(String memberName, Object value) {
         validateMemberName(memberName);
-        if (value instanceof Class<?>) {
-            addMember(memberName, "$T.class", value);
-        } else if (value instanceof Enum<?>) {
-            addMember(memberName, "$T.$L", value.getClass(), ((Enum<?>) value).name());
-        } else if (value instanceof String) {
-            addMember(memberName, "$S", value);
-        } else if (value instanceof Float) {
-            addMember(memberName, "$Lf", value);
-        } else if (value instanceof Long) {
-            addMember(memberName, "$LL", value);
-        } else if (value instanceof Character) {
-            addMember(memberName, "'$L'", Util.characterLiteralWithoutSingleQuotes((char) value));
-        } else {
-            addMember(memberName, "$L", value);
+
+        for (AnnotationValueHandler.ValueHandler handler : valueHandlers) {
+            if (handler.supports(value)) {
+                handler.handle(memberName, value, this);
+                return;
+            }
         }
     }
 
     /**
      * Returns an immutable map of members.
+     * Internally mutable map is still used
      */
     public Map<String, List<CodeBlock>> getMembers() {
-        Map<String, List<CodeBlock>> immutableMembers = Collections.unmodifiableMap(new LinkedHashMap<>(members));
-        return immutableMembers; //return immutable copy, internally mutable map is still used
+        return Collections.unmodifiableMap(new LinkedHashMap<>(members));
     }
 
     /**
