@@ -24,7 +24,6 @@ import java.util.Map;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
 
-import static com.squareup.javapoet.Util.characterLiteralWithoutSingleQuotes;
 import static com.squareup.javapoet.Util.checkArgument;
 import static com.squareup.javapoet.Util.checkNotNull;
 
@@ -38,7 +37,7 @@ public final class AnnotationSpec {
 
   private AnnotationSpec(Builder builder) {
     this.type = builder.type;
-    this.members = Util.immutableMultimap(builder.members);
+    this.members = builder.members;
     this.formatter = builder.formatter != null
             ? builder.formatter
             : new DefaultAnnotationFormatter();
@@ -71,9 +70,7 @@ public final class AnnotationSpec {
 
   public Builder toBuilder() {
     Builder builder = new Builder(type);
-    for (Map.Entry<String, List<CodeBlock>> entry : members.entrySet()) {
-      builder.members.put(entry.getKey(), new ArrayList<>(entry.getValue()));
-    }
+    builder.memberManager = new AnnotationMemberManager(new LinkedHashMap<>(members));
     builder.formatter(formatter);
     return builder;
   }
@@ -102,20 +99,17 @@ public final class AnnotationSpec {
 
   public static final class Builder {
     private final TypeName type;
-    public final Map<String, List<CodeBlock>> members = new LinkedHashMap<>();
+    public Map<String, List<CodeBlock>> members = new LinkedHashMap<>();
     private AnnotationFormatter formatter;
+    private AnnotationMemberManager memberManager;
 
     private Builder(TypeName type) {
       this.type = type;
+      this.memberManager = new AnnotationMemberManager(members);
     }
 
     public Builder addMember(String name, String format, Object... args) {
-      return addMember(name, CodeBlock.of(format, args));
-    }
-
-    public Builder addMember(String name, CodeBlock codeBlock) {
-      List<CodeBlock> values = members.computeIfAbsent(name, k -> new ArrayList<>());
-      values.add(codeBlock);
+      memberManager.addMember(name, format, args);
       return this;
     }
 
@@ -124,37 +118,17 @@ public final class AnnotationSpec {
       return this;
     }
 
-    /**
-     * Delegates to {@link #addMember(String, String, Object...)}, with parameter {@code format}
-     * depending on the given {@code value} object. Falls back to {@code "$L"} literal format if
-     * the class of the given {@code value} object is not supported.
-     */
     Builder addMemberForValue(String memberName, Object value) {
-      checkNotNull(memberName, "memberName == null");
-      checkNotNull(value, "value == null, constant non-null value expected for %s", memberName);
-      checkArgument(SourceVersion.isName(memberName), "not a valid name: %s", memberName);
-      if (value instanceof Class<?>) {
-        return addMember(memberName, "$T.class", value);
-      }
-      if (value instanceof Enum) {
-        return addMember(memberName, "$T.$L", value.getClass(), ((Enum<?>) value).name());
-      }
-      if (value instanceof String) {
-        return addMember(memberName, "$S", value);
-      }
-      if (value instanceof Float) {
-        return addMember(memberName, "$Lf", value);
-      }
-      if (value instanceof Long) {
-        return addMember(memberName, "$LL", value);
-      }
-      if (value instanceof Character) {
-        return addMember(memberName, "'$L'", characterLiteralWithoutSingleQuotes((char) value));
-      }
-      return addMember(memberName, "$L", value);
+      memberManager.addMemberForValue(memberName, value);
+      return this;
     }
 
     public AnnotationSpec build() {
+      System.out.println("Members in the build before getMembers:");
+      System.out.println(members);
+      members = memberManager.getMembers();
+      System.out.println("Members in the build after getMembers:");
+      System.out.println(members);
       for (String name : members.keySet()) {
         checkNotNull(name, "name == null");
         checkArgument(SourceVersion.isName(name), "not a valid name: %s", name);
