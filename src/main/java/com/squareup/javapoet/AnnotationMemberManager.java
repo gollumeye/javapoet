@@ -1,7 +1,11 @@
 package com.squareup.javapoet;
 
-import java.util.*;
 import javax.lang.model.SourceVersion;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Collections;
 
 public final class AnnotationMemberManager {
     private Map<String, List<CodeBlock>> members = new LinkedHashMap<>();
