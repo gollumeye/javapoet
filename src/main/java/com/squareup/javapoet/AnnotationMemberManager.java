@@ -23,10 +23,8 @@ public final class AnnotationMemberManager {
 
     public void addMember(String name, CodeBlock codeBlock) {
         validateMemberName(name);
-        System.out.println("Before: " + members);
         List<CodeBlock> values = members.computeIfAbsent(name, k -> new ArrayList<>());
         values.add(codeBlock);
-        System.out.println("After: " + members);
     }
 
 
@@ -58,8 +56,6 @@ public final class AnnotationMemberManager {
      * Returns an immutable map of members.
      */
     public Map<String, List<CodeBlock>> getMembers() {
-        System.out.println("Immutable Map of Members Returned:");
-        System.out.println(members);
         Map<String, List<CodeBlock>> immutableMembers = Collections.unmodifiableMap(new LinkedHashMap<>(members));
         return immutableMembers; //return immutable copy, internally mutable map is still used
     }

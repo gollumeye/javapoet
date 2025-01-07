@@ -123,11 +123,7 @@ public final class AnnotationSpec {
     }
 
     public AnnotationSpec build() {
-      System.out.println("Members in the build before getMembers:");
-      System.out.println(members);
       members = memberManager.getMembers();
-      System.out.println("Members in the build after getMembers:");
-      System.out.println(members);
       for (String name : members.keySet()) {
         checkNotNull(name, "name == null");
         checkArgument(SourceVersion.isName(name), "not a valid name: %s", name);
