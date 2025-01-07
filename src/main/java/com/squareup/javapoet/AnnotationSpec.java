@@ -17,23 +17,12 @@ package com.squareup.javapoet;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.AnnotationValue;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.SimpleAnnotationValueVisitor8;
 
 import static com.squareup.javapoet.Util.characterLiteralWithoutSingleQuotes;
 import static com.squareup.javapoet.Util.checkArgument;
@@ -60,49 +49,15 @@ public final class AnnotationSpec {
   }
 
   public static AnnotationSpec get(Annotation annotation) {
-    return get(annotation, false);
+    return AnnotationSpecConversionUtils.fromAnnotation(annotation, false);
   }
 
   public static AnnotationSpec get(Annotation annotation, boolean includeDefaultValues) {
-    Builder builder = builder(annotation.annotationType());
-    try {
-      Method[] methods = annotation.annotationType().getDeclaredMethods();
-      Arrays.sort(methods, Comparator.comparing(Method::getName));
-      for (Method method : methods) {
-        Object value = method.invoke(annotation);
-        if (!includeDefaultValues) {
-          if (Objects.deepEquals(value, method.getDefaultValue())) {
-            continue;
-          }
-        }
-        if (value.getClass().isArray()) {
-          for (int i = 0; i < Array.getLength(value); i++) {
-            builder.addMemberForValue(method.getName(), Array.get(value, i));
-          }
-          continue;
-        }
-        if (value instanceof Annotation) {
-          builder.addMember(method.getName(), "$L", get((Annotation) value));
-          continue;
-        }
-        builder.addMemberForValue(method.getName(), value);
-      }
-    } catch (Exception e) {
-      throw new RuntimeException("Reflecting " + annotation + " failed!", e);
-    }
-    return builder.build();
+    return AnnotationSpecConversionUtils.fromAnnotation(annotation, includeDefaultValues);
   }
 
   public static AnnotationSpec get(AnnotationMirror annotation) {
-    TypeElement element = (TypeElement) annotation.getAnnotationType().asElement();
-    AnnotationSpec.Builder builder = AnnotationSpec.builder(ClassName.get(element));
-    Visitor visitor = new Visitor(builder);
-    for (ExecutableElement executableElement : annotation.getElementValues().keySet()) {
-      String name = executableElement.getSimpleName().toString();
-      AnnotationValue value = annotation.getElementValues().get(executableElement);
-      value.accept(visitor, name);
-    }
-    return builder.build();
+    return AnnotationSpecConversionUtils.fromAnnotationMirror(annotation);
   }
 
   public static Builder builder(ClassName type) {
@@ -205,41 +160,6 @@ public final class AnnotationSpec {
         checkArgument(SourceVersion.isName(name), "not a valid name: %s", name);
       }
       return new AnnotationSpec(this);
-    }
-  }
-
-  /**
-   * Annotation value visitor adding members to the given builder instance.
-   */
-  private static class Visitor extends SimpleAnnotationValueVisitor8<Builder, String> {
-    final Builder builder;
-
-    Visitor(Builder builder) {
-      super(builder);
-      this.builder = builder;
-    }
-
-    @Override protected Builder defaultAction(Object o, String name) {
-      return builder.addMemberForValue(name, o);
-    }
-
-    @Override public Builder visitAnnotation(AnnotationMirror a, String name) {
-      return builder.addMember(name, "$L", get(a));
-    }
-
-    @Override public Builder visitEnumConstant(VariableElement c, String name) {
-      return builder.addMember(name, "$T.$L", c.asType(), c.getSimpleName());
-    }
-
-    @Override public Builder visitType(TypeMirror t, String name) {
-      return builder.addMember(name, "$T.class", t);
-    }
-
-    @Override public Builder visitArray(List<? extends AnnotationValue> values, String name) {
-      for (AnnotationValue value : values) {
-        value.accept(this, name);
-      }
-      return builder;
     }
   }
 }
