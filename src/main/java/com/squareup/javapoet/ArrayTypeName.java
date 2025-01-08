@@ -15,6 +15,8 @@
  */
 package com.squareup.javapoet;
 
+import com.squareup.javapoet.codewriter.CodeWriter;
+
 import java.io.IOException;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
@@ -47,7 +49,8 @@ public final class ArrayTypeName extends TypeName {
     return new ArrayTypeName(componentType);
   }
 
-  @Override CodeWriter emit(CodeWriter out) throws IOException {
+  @Override
+  public CodeWriter emit(CodeWriter out) throws IOException {
     return emit(out, false);
   }
 

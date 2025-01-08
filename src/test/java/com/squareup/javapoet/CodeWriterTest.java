@@ -1,5 +1,6 @@
 package com.squareup.javapoet;
 
+import com.squareup.javapoet.codewriter.CodeWriter;
 import org.junit.Test;
 
 import java.io.IOException;

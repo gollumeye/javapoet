@@ -7,12 +7,12 @@ import java.util.Map;
 public class Multiset<T> {
     private final Map<T, Integer> map = new LinkedHashMap<>();
 
-    void add(T t) {
+    public void add(T t) {
         int count = map.getOrDefault(t, 0);
         map.put(t, count + 1);
     }
 
-    void remove(T t) {
+    public void remove(T t) {
         int count = map.getOrDefault(t, 0);
         if (count == 0) {
             throw new IllegalStateException(t + " is not in the multiset");
@@ -20,7 +20,7 @@ public class Multiset<T> {
         map.put(t, count - 1);
     }
 
-    boolean contains(T t) {
+    public boolean contains(T t) {
         return map.getOrDefault(t, 0) > 0;
     }
 }
