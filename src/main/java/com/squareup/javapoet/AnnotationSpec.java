@@ -33,7 +33,7 @@ public final class AnnotationSpec {
   public static final String VALUE = "value";
   private final AnnotationFormatter formatter;
 
-  public final TypeName type;
+  public final TypeNameProvider type;
   public final Map<String, List<CodeBlock>> members;
 
   private AnnotationSpec(Builder builder) {
@@ -99,12 +99,12 @@ public final class AnnotationSpec {
   }
 
   public static final class Builder {
-    private final TypeName type;
+    private final TypeNameProvider type;
     public Map<String, List<CodeBlock>> members = new LinkedHashMap<>();
     private AnnotationFormatter formatter;
     private AnnotationMemberManager memberManager;
 
-    private Builder(TypeName type) {
+    private Builder(TypeNameProvider type) {
       this.type = type;
       this.memberManager = new AnnotationMemberManager(members);
     }

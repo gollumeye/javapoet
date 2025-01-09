@@ -32,12 +32,13 @@ import static com.squareup.javapoet.Util.checkState;
 
 /** A generated field declaration. */
 public final class FieldSpec {
-  public final TypeName type;
+  public final TypeNameProvider type;
   public final String name;
   public final CodeBlock javadoc;
   public final List<AnnotationSpec> annotations;
   public final Set<Modifier> modifiers;
   public final CodeBlock initializer;
+  private static final ITypeNameStaticAdapter TYPE_NAME_STATIC_ADAPTER = new TypeNameStaticAdapter();
 
   private FieldSpec(Builder builder) {
     this.type = checkNotNull(builder.type, "type == null");
@@ -88,7 +89,7 @@ public final class FieldSpec {
     }
   }
 
-  public static Builder builder(TypeName type, String name, Modifier... modifiers) {
+  public static Builder builder(TypeNameProvider type, String name, Modifier... modifiers) {
     checkNotNull(type, "type == null");
     checkArgument(SourceVersion.isName(name), "not a valid name: %s", name);
     return new Builder(type, name)
@@ -96,7 +97,7 @@ public final class FieldSpec {
   }
 
   public static Builder builder(Type type, String name, Modifier... modifiers) {
-    return builder(TypeName.get(type), name, modifiers);
+    return builder(TYPE_NAME_STATIC_ADAPTER.get(type), name, modifiers);
   }
 
   public Builder toBuilder() {
@@ -109,7 +110,7 @@ public final class FieldSpec {
   }
 
   public static final class Builder {
-    private final TypeName type;
+    private final TypeNameProvider type;
     private final String name;
 
     private final CodeBlock.Builder javadoc = CodeBlock.builder();
@@ -118,7 +119,7 @@ public final class FieldSpec {
     public final List<AnnotationSpec> annotations = new ArrayList<>();
     public final List<Modifier> modifiers = new ArrayList<>();
 
-    private Builder(TypeName type, String name) {
+    private Builder(TypeNameProvider type, String name) {
       this.type = type;
       this.name = name;
     }

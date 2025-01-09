@@ -37,8 +37,9 @@ public final class ParameterSpec {
   public final String name;
   public final List<AnnotationSpec> annotations;
   public final Set<Modifier> modifiers;
-  public final TypeName type;
+  public final TypeNameProvider type;
   public final CodeBlock javadoc;
+  private static final ITypeNameStaticAdapter TYPE_NAME_STATIC_ADAPTER = new TypeNameStaticAdapter();
 
   private ParameterSpec(Builder builder) {
     this.name = checkNotNull(builder.name, "name == null");
@@ -56,7 +57,7 @@ public final class ParameterSpec {
     codeWriter.emitAnnotations(annotations, true);
     codeWriter.emitModifiers(modifiers);
     if (varargs) {
-      TypeName.asArray(type).emit(codeWriter, true);
+      TYPE_NAME_STATIC_ADAPTER.asArray(type).emit(codeWriter, true);
     } else {
       type.emit(codeWriter);
     }
@@ -88,7 +89,7 @@ public final class ParameterSpec {
   public static ParameterSpec get(VariableElement element) {
     checkArgument(element.getKind().equals(ElementKind.PARAMETER), "element is not a parameter");
 
-    TypeName type = TypeName.get(element.asType());
+    TypeNameProvider type = TYPE_NAME_STATIC_ADAPTER.get(element.asType());
     String name = element.getSimpleName().toString();
     // Copying parameter annotations can be incorrect so we're deliberately not including them.
     // See https://github.com/square/javapoet/issues/482.
@@ -114,7 +115,7 @@ public final class ParameterSpec {
     return name.equals("this") || SourceVersion.isName(name);
   }
 
-  public static Builder builder(TypeName type, String name, Modifier... modifiers) {
+  public static Builder builder(TypeNameProvider type, String name, Modifier... modifiers) {
     checkNotNull(type, "type == null");
     checkArgument(isValidParameterName(name), "not a valid name: %s", name);
     return new Builder(type, name)
@@ -122,14 +123,14 @@ public final class ParameterSpec {
   }
 
   public static Builder builder(Type type, String name, Modifier... modifiers) {
-    return builder(TypeName.get(type), name, modifiers);
+    return builder(TYPE_NAME_STATIC_ADAPTER.get(type), name, modifiers);
   }
 
   public Builder toBuilder() {
     return toBuilder(type, name);
   }
 
-  Builder toBuilder(TypeName type, String name) {
+  Builder toBuilder(TypeNameProvider type, String name) {
     Builder builder = new Builder(type, name);
     builder.annotations.addAll(annotations);
     builder.modifiers.addAll(modifiers);
@@ -137,14 +138,14 @@ public final class ParameterSpec {
   }
 
   public static final class Builder {
-    private final TypeName type;
+    private final TypeNameProvider type;
     private final String name;
     private final CodeBlock.Builder javadoc = CodeBlock.builder();
 
     public final List<AnnotationSpec> annotations = new ArrayList<>();
     public final List<Modifier> modifiers = new ArrayList<>();
 
-    private Builder(TypeName type, String name) {
+    private Builder(TypeNameProvider type, String name) {
       this.type = type;
       this.name = name;
     }
