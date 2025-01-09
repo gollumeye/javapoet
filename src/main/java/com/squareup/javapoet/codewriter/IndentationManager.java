@@ -1,7 +1,5 @@
 package com.squareup.javapoet.codewriter;
 
-import java.io.IOException;
-
 public class IndentationManager {
     private final String indent;
     private int indentLevel = 0;

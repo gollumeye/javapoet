@@ -31,7 +31,7 @@ public final class CodeWriter {
   private static final Pattern LINE_BREAKING_PATTERN = Pattern.compile("\\R");
 
   private final IndentationManager indentationManager;
-  private final TextWrapper out;
+  private final LineWrapper out;
   private final StaticImportManager staticImportManager;
   private boolean javadoc = false;
   private boolean comment = false;
@@ -54,7 +54,7 @@ public final class CodeWriter {
   }
 
   public CodeWriter(Appendable out, String indent, Map<String, ClassName> importedTypes, Set<String> staticImports, Set<String> alwaysQualify) {
-    this.out = new TextWrapper(out, indent, 100);
+    this.out = new LineWrapper(out, indent, 100);
     this.indentationManager = new IndentationManager(indent);
     this.staticImportManager = new StaticImportManager(staticImports);
     this.importedTypes = checkNotNull(importedTypes, "importedTypes == null");
@@ -229,7 +229,11 @@ public final class CodeWriter {
           out.zeroWidthSpace(indentationManager.getIndentLevel() + 2);
           break;
         default:
-          deferredTypeName = handleDeferredTypeName(deferredTypeName, part);
+          Boolean handled = handleDeferredTypeName(deferredTypeName, part);
+          deferredTypeName = null;
+          if (Boolean.TRUE.equals(handled)) {
+            break;
+          }
           emitAndIndent(part);
           break;
       }
@@ -272,11 +276,12 @@ public final class CodeWriter {
     statementLine = -1;
   }
 
-  private ClassName handleDeferredTypeName(ClassName deferredTypeName, String part) throws IOException {
+  private Boolean handleDeferredTypeName(ClassName deferredTypeName, String part) throws IOException {
     if (deferredTypeName != null) {
       if (part.startsWith(".")) {
         if (staticImportManager.contains(deferredTypeName.canonicalName, part)) {
-          return null;
+          emitAndIndent(part.substring(1));
+          return true;
         }
       }
       deferredTypeName.emit(this);
