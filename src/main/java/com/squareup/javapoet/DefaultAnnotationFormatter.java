@@ -1,5 +1,7 @@
 package com.squareup.javapoet;
 
+import com.squareup.javapoet.codewriter.CodeWriter;
+
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;

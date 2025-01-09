@@ -23,7 +23,7 @@ import static com.squareup.javapoet.Util.checkNotNull;
  * Implements soft line wrapping on an appendable. To use, append characters using {@link #append}
  * or soft-wrapping spaces using {@link #wrappingSpace}.
  */
-final class LineWrapper {
+public final class LineWrapper {
   private final RecordingAppendable out;
   private final String indent;
   private final int columnLimit;
@@ -45,7 +45,7 @@ final class LineWrapper {
    */
   private FlushType nextFlush;
 
-  LineWrapper(Appendable out, String indent, int columnLimit) {
+  public LineWrapper(Appendable out, String indent, int columnLimit) {
     checkNotNull(out, "out == null");
     this.out = new RecordingAppendable(out);
     this.indent = indent;
@@ -53,12 +53,12 @@ final class LineWrapper {
   }
 
   /** @return the last emitted char or {@link Character#MIN_VALUE} if nothing emitted yet. */
-  char lastChar() {
+  public char lastChar() {
     return out.lastChar;
   }
 
   /** Emit {@code s}. This may be buffered to permit line wraps to be inserted. */
-  void append(String s) throws IOException {
+  public void append(String s) throws IOException {
     if (closed) throw new IllegalStateException("closed");
 
     if (nextFlush != null) {
@@ -85,7 +85,7 @@ final class LineWrapper {
   }
 
   /** Emit either a space or a newline character. */
-  void wrappingSpace(int indentLevel) throws IOException {
+  public void wrappingSpace(int indentLevel) throws IOException {
     if (closed) throw new IllegalStateException("closed");
 
     if (this.nextFlush != null) flush(nextFlush);
@@ -95,7 +95,7 @@ final class LineWrapper {
   }
 
   /** Emit a newline character if the line will exceed it's limit, otherwise do nothing. */
-  void zeroWidthSpace(int indentLevel) throws IOException {
+  public void zeroWidthSpace(int indentLevel) throws IOException {
     if (closed) throw new IllegalStateException("closed");
 
     if (column == 0) return;

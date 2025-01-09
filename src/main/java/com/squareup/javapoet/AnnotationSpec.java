@@ -15,6 +15,8 @@
  */
 package com.squareup.javapoet;
 
+import com.squareup.javapoet.codewriter.CodeWriter;
+
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.LinkedHashMap;
@@ -42,7 +44,7 @@ public final class AnnotationSpec {
             : new DefaultAnnotationFormatter();
   }
 
-  void emit(CodeWriter codeWriter, boolean inline) throws IOException {
+  public void emit(CodeWriter codeWriter, boolean inline) throws IOException {
     formatter.format(this, codeWriter, inline);
   }
 
