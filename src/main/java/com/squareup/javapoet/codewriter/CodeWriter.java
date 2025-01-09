@@ -15,14 +15,33 @@
  */
 package com.squareup.javapoet.codewriter;
 
-import com.squareup.javapoet.*;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.LineWrapper;
+import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.Multiset;
+import com.squareup.javapoet.CodeBlock;
+import com.squareup.javapoet.AnnotationSpec;
+import com.squareup.javapoet.TypeVariableName;
+import com.squareup.javapoet.TypeName;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Objects;
+import java.util.ListIterator;
+import java.util.Locale;
 import java.util.regex.Pattern;
 import javax.lang.model.element.Modifier;
 
-import static com.squareup.javapoet.Util.*;
+import static com.squareup.javapoet.Util.checkNotNull;
+import static com.squareup.javapoet.Util.checkState;
+import static com.squareup.javapoet.Util.stringLiteralWithDoubleQuotes;
 import static java.lang.String.join;
 
 
