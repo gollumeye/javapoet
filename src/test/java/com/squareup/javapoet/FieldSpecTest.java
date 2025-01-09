@@ -15,12 +15,14 @@
  */
 package com.squareup.javapoet;
 
+import com.squareup.javapoet.codewriter.CodeWriter;
 import org.junit.Test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.fail;
 
 import javax.lang.model.element.Modifier;
+import java.util.Collections;
 
 public class FieldSpecTest {
   @Test public void equalsAndHashCode() {
@@ -62,5 +64,56 @@ public class FieldSpecTest {
 
     builder.modifiers.remove(1);
     assertThat(builder.build().modifiers).containsExactly(Modifier.PUBLIC);
+  }
+
+  @Test
+  public void initializerSetOnce() {
+    FieldSpec.Builder builder = FieldSpec.builder(int.class, "foo")
+            .initializer("$L", 42);
+    try {
+      builder.initializer("$L", 43);
+      fail();
+    } catch (IllegalStateException expected) {
+      assertThat(expected.getMessage()).isEqualTo("initializer was already set");
+    }
+  }
+
+  @Test
+  public void testHasModifier() {
+    FieldSpec field = FieldSpec.builder(int.class, "foo", Modifier.PUBLIC).build();
+    assertThat(field.hasModifier(Modifier.PUBLIC)).isTrue();
+    assertThat(field.hasModifier(Modifier.PRIVATE)).isFalse();
+  }
+
+  @Test
+  public void toBuilderCopiesAll() {
+    FieldSpec original = FieldSpec.builder(int.class, "foo", Modifier.PUBLIC)
+            .addAnnotation(Override.class)
+            .addJavadoc("Test field")
+            .initializer("$L", 123)
+            .build();
+
+    FieldSpec copy = original.toBuilder().build();
+    assertThat(copy.toString()).isEqualTo(original.toString());
+  }
+
+  @Test
+  public void emitFieldSpec() throws Exception {
+    StringBuilder output = new StringBuilder();
+    CodeWriter codeWriter = new CodeWriter(output);
+
+    FieldSpec field = FieldSpec.builder(int.class, "foo", Modifier.PRIVATE)
+            .initializer("$L", 42)
+            .build();
+
+    field.emit(codeWriter, Collections.emptySet());
+    assertThat(output.toString()).isEqualTo("private int foo = 42;\n");
+  }
+
+  @Test
+  public void testEmptyInitializer() {
+    FieldSpec field = FieldSpec.builder(String.class, "foo").build();
+    assertThat(field.initializer.isEmpty()).isTrue();
+    assertThat(field.toString()).isEqualTo("java.lang.String foo;\n");
   }
 }
