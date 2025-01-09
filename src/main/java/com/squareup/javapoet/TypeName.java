@@ -67,7 +67,7 @@ import javax.lang.model.util.SimpleTypeVisitor8;
  * {@code Set<Long>}, use the factory methods on {@link ArrayTypeName}, {@link
  * ParameterizedTypeName}, {@link TypeVariableName}, and {@link WildcardTypeName}.
  */
-public class TypeName {
+public class TypeName implements TypeNameProvider {
   public static final TypeName VOID = new TypeName("void");
   public static final TypeName BOOLEAN = new TypeName("boolean");
   public static final TypeName BYTE = new TypeName("byte");
@@ -96,7 +96,7 @@ public class TypeName {
   /** Lazily-initialized toString of this type name. */
   private String cachedString;
 
-  private TypeName(String keyword) {
+  protected TypeName(String keyword) {
     this(keyword, new ArrayList<>());
   }
 
@@ -119,6 +119,7 @@ public class TypeName {
     return new TypeName(keyword, concatAnnotations(annotations));
   }
 
+  @Override
   public TypeName withoutAnnotations() {
     if (annotations.isEmpty()) {
       return this;
@@ -132,6 +133,7 @@ public class TypeName {
     return allAnnotations;
   }
 
+  @Override
   public boolean isAnnotated() {
     return !annotations.isEmpty();
   }
@@ -140,6 +142,7 @@ public class TypeName {
    * Returns true if this is a primitive type like {@code int}. Returns false for all other types
    * types including boxed primitives and {@code void}.
    */
+  @Override
   public boolean isPrimitive() {
     return keyword != null && this != VOID;
   }
@@ -148,6 +151,7 @@ public class TypeName {
    * Returns true if this is a boxed primitive type like {@code Integer}. Returns false for all
    * other types types including unboxed primitives and {@code java.lang.Void}.
    */
+  @Override
   public boolean isBoxedPrimitive() {
     TypeName thisWithoutAnnotations = withoutAnnotations();
     return thisWithoutAnnotations.equals(BOXED_BOOLEAN)
@@ -164,6 +168,7 @@ public class TypeName {
    * Returns a boxed type if this is a primitive type (like {@code Integer} for {@code int}) or
    * {@code void}. Returns this type if boxing doesn't apply.
    */
+  @Override
   public TypeName box() {
     if (keyword == null) return this; // Doesn't need boxing.
     TypeName boxed = null;
@@ -186,6 +191,7 @@ public class TypeName {
    *
    * @throws UnsupportedOperationException if this type isn't eligible for unboxing.
    */
+  @Override
   public TypeName unbox() {
     if (keyword != null) return this; // Already unboxed.
     TypeName thisWithoutAnnotations = withoutAnnotations();
