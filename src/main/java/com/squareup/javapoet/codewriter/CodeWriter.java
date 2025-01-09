@@ -72,7 +72,8 @@ public final class CodeWriter {
     this(out, indent, Collections.emptyMap(), staticImports, alwaysQualify);
   }
 
-  public CodeWriter(Appendable out, String indent, Map<String, ClassName> importedTypes, Set<String> staticImports, Set<String> alwaysQualify) {
+  public CodeWriter(Appendable out, String indent, Map<String, ClassName> importedTypes,
+                    Set<String> staticImports, Set<String> alwaysQualify) {
     this.out = new LineWrapper(out, indent, 100);
     this.indentationManager = new IndentationManager(indent);
     this.staticImportManager = new StaticImportManager(staticImports);
@@ -267,7 +268,8 @@ public final class CodeWriter {
     emitAndIndent(string != null ? stringLiteralWithDoubleQuotes(string, indentationManager.getIndent()) : "null");
   }
 
-  private ClassName emitTypeName(CodeBlock codeBlock, int a, ListIterator<String> partIterator, ClassName deferredTypeName) throws IOException {
+  private ClassName emitTypeName(CodeBlock codeBlock, int a, ListIterator<String> partIterator,
+                                 ClassName deferredTypeName) throws IOException {
     TypeName typeName = (TypeName) codeBlock.args.get(a);
     if (typeName instanceof ClassName && partIterator.hasNext()) {
       if (!codeBlock.formatParts.get(partIterator.nextIndex()).startsWith("$")) {
