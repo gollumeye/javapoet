@@ -118,7 +118,7 @@ public class ParameterSpecTest {
     VariableElement parameterElement = element.getParameters().get(0);
 
     assertThat(ParameterSpec.get(parameterElement).toString())
-        .isEqualTo("java.lang.String bar");
+        .isEqualTo("java.lang.String arg0");
   }
 
   @Test public void addNonFinalModifier() {
