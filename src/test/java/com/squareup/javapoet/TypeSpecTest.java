@@ -457,6 +457,7 @@ public final class TypeSpecTest {
           .build();
       fail();
     } catch (IllegalStateException expected) {
+      assertThat(expected).isInstanceOf(IllegalStateException.class);
     }
   }
 
@@ -850,6 +851,7 @@ public final class TypeSpecTest {
           .build();
       fail();
     } catch (IllegalStateException expected) {
+      assertThat(expected).isInstanceOf(IllegalStateException.class);
     }
   }
 
@@ -865,6 +867,7 @@ public final class TypeSpecTest {
           .build();
       fail();
     } catch (IllegalStateException expected) {
+      assertThat(expected).isInstanceOf(IllegalStateException.class);
     }
   }
 
@@ -922,6 +925,7 @@ public final class TypeSpecTest {
           .build();
       fail();
     } catch (IllegalStateException expected) {
+      assertThat(expected).isInstanceOf(IllegalStateException.class);
     }
 
     try {
@@ -933,6 +937,7 @@ public final class TypeSpecTest {
           .build();
       fail();
     } catch (IllegalStateException expected) {
+      assertThat(expected).isInstanceOf(IllegalStateException.class);
     }
 
     try {
@@ -945,6 +950,7 @@ public final class TypeSpecTest {
           .build();
       fail();
     } catch (IllegalArgumentException expected) {
+      assertThat(expected).isInstanceOf(IllegalArgumentException.class);
     }
   }
 
@@ -1828,6 +1834,7 @@ public final class TypeSpecTest {
           .build();
       fail();
     } catch (IllegalStateException expected) {
+      assertThat(expected).isInstanceOf(IllegalStateException.class);
     }
 
     try {
@@ -1837,6 +1844,7 @@ public final class TypeSpecTest {
           .build();
       fail();
     } catch (IllegalStateException expected) {
+      assertThat(expected).isInstanceOf(IllegalStateException.class);
     }
   }
 
@@ -2235,16 +2243,19 @@ public final class TypeSpecTest {
       TypeSpec.annotationBuilder("A").superclass(ClassName.get(Object.class));
       fail();
     } catch (IllegalStateException expected) {
+      assertThat(expected).isInstanceOf(IllegalStateException.class);
     }
     try {
       TypeSpec.enumBuilder("E").superclass(ClassName.get(Object.class));
       fail();
     } catch (IllegalStateException expected) {
+      assertThat(expected).isInstanceOf(IllegalStateException.class);
     }
     try {
       TypeSpec.interfaceBuilder("I").superclass(ClassName.get(Object.class));
       fail();
     } catch (IllegalStateException expected) {
+      assertThat(expected).isInstanceOf(IllegalStateException.class);
     }
   }
 
@@ -2255,12 +2266,14 @@ public final class TypeSpecTest {
           .superclass(ClassName.get(Map.class));
       fail();
     } catch (IllegalStateException expected) {
+      assertThat(expected).isInstanceOf(IllegalStateException.class);
     }
     try {
       TypeSpec.classBuilder("foo")
           .superclass(TypeName.INT);
       fail();
     } catch (IllegalArgumentException expected) {
+      assertThat(expected).isInstanceOf(IllegalArgumentException.class);
     }
   }
 
@@ -2427,6 +2440,7 @@ public final class TypeSpecTest {
       interfaceBuilder.addInitializerBlock(CodeBlock.builder().build());
       fail("Exception expected");
     } catch (UnsupportedOperationException e) {
+      assertThat(e).isInstanceOf(UnsupportedOperationException.class);
     }
   }
 
@@ -2436,6 +2450,7 @@ public final class TypeSpecTest {
       annotationBuilder.addInitializerBlock(CodeBlock.builder().build());
       fail("Exception expected");
     } catch (UnsupportedOperationException e) {
+      assertThat(e).isInstanceOf(UnsupportedOperationException.class);
     }
   }
 

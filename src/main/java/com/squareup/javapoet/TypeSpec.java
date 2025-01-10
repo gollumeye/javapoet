@@ -67,6 +67,9 @@ public final class TypeSpec {
   public final List<Element> originatingElements;
   public final Set<String> alwaysQualifiedNames;
 
+  private static final String CLASSNAME_NULL_FORMAT = "className == null";
+  private static final String NAME_NULL_FORMAT = "name == null";
+
   private TypeSpec(Builder builder) {
     this.kind = builder.kind;
     this.name = builder.name;
@@ -127,27 +130,27 @@ public final class TypeSpec {
   }
 
   public static Builder classBuilder(String name) {
-    return new Builder(Kind.CLASS, checkNotNull(name, "name == null"), null);
+    return new Builder(Kind.CLASS, checkNotNull(name, NAME_NULL_FORMAT), null);
   }
 
   public static Builder classBuilder(ClassName className) {
-    return classBuilder(checkNotNull(className, "className == null").simpleName());
+    return classBuilder(checkNotNull(className, CLASSNAME_NULL_FORMAT).simpleName());
   }
 
   public static Builder interfaceBuilder(String name) {
-    return new Builder(Kind.INTERFACE, checkNotNull(name, "name == null"), null);
+    return new Builder(Kind.INTERFACE, checkNotNull(name, NAME_NULL_FORMAT), null);
   }
 
   public static Builder interfaceBuilder(ClassName className) {
-    return interfaceBuilder(checkNotNull(className, "className == null").simpleName());
+    return interfaceBuilder(checkNotNull(className, CLASSNAME_NULL_FORMAT).simpleName());
   }
 
   public static Builder enumBuilder(String name) {
-    return new Builder(Kind.ENUM, checkNotNull(name, "name == null"), null);
+    return new Builder(Kind.ENUM, checkNotNull(name, NAME_NULL_FORMAT), null);
   }
 
   public static Builder enumBuilder(ClassName className) {
-    return enumBuilder(checkNotNull(className, "className == null").simpleName());
+    return enumBuilder(checkNotNull(className, CLASSNAME_NULL_FORMAT).simpleName());
   }
 
   public static Builder anonymousClassBuilder(String typeArgumentsFormat, Object... args) {
@@ -159,11 +162,11 @@ public final class TypeSpec {
   }
 
   public static Builder annotationBuilder(String name) {
-    return new Builder(Kind.ANNOTATION, checkNotNull(name, "name == null"), null);
+    return new Builder(Kind.ANNOTATION, checkNotNull(name, NAME_NULL_FORMAT), null);
   }
 
   public static Builder annotationBuilder(ClassName className) {
-    return annotationBuilder(checkNotNull(className, "className == null").simpleName());
+    return annotationBuilder(checkNotNull(className, CLASSNAME_NULL_FORMAT).simpleName());
   }
 
   public Builder toBuilder() {
@@ -431,6 +434,8 @@ public final class TypeSpec {
     public final List<Element> originatingElements = new ArrayList<>();
     public final Set<String> alwaysQualifiedNames = new LinkedHashSet<>();
 
+    private static final String REQUIRES_MODIFIERS_FORMAT = "%s %s.%s requires modifiers %s";
+
     private Builder(Kind kind, String name,
         CodeBlock anonymousTypeArguments) {
       checkArgument(name == null || SourceVersion.isName(name), "not a valid name: %s", name);
@@ -661,13 +666,13 @@ public final class TypeSpec {
 
     public Builder alwaysQualify(String... simpleNames) {
       checkArgument(simpleNames != null, "simpleNames == null");
-      for (String name : simpleNames) {
+      for (String simpleName : simpleNames) {
         checkArgument(
-            name != null,
+            simpleName != null,
             "null entry in simpleNames array: %s",
             Arrays.toString(simpleNames)
         );
-        alwaysQualifiedNames.add(name);
+        alwaysQualifiedNames.add(simpleName);
       }
       return this;
     }
@@ -701,9 +706,9 @@ public final class TypeSpec {
       for (TypeElement nestedType : ElementFilter.typesIn(typeElement.getEnclosedElements())) {
         alwaysQualify(nestedType.getSimpleName().toString());
       }
-      TypeMirror superclass = typeElement.getSuperclass();
-      if (!(superclass instanceof NoType) && superclass instanceof DeclaredType) {
-        TypeElement superclassElement = (TypeElement) ((DeclaredType) superclass).asElement();
+      TypeMirror elementSuperclass = typeElement.getSuperclass();
+      if (!(elementSuperclass instanceof NoType) && elementSuperclass instanceof DeclaredType) {
+        TypeElement superclassElement = (TypeElement) ((DeclaredType) elementSuperclass).asElement();
         avoidClashesWithNestedClasses(superclassElement);
       }
       for (TypeMirror superinterface : typeElement.getInterfaces()) {
@@ -745,9 +750,9 @@ public final class TypeSpec {
       for (Class<?> nestedType : clazz.getDeclaredClasses()) {
         alwaysQualify(nestedType.getSimpleName());
       }
-      Class<?> superclass = clazz.getSuperclass();
-      if (superclass != null && !Object.class.equals(superclass)) {
-        avoidClashesWithNestedClasses(superclass);
+      Class<?> clazzSuperclass = clazz.getSuperclass();
+      if (clazzSuperclass != null && !Object.class.equals(clazzSuperclass)) {
+        avoidClashesWithNestedClasses(clazzSuperclass);
       }
       for (Class<?> superinterface : clazz.getInterfaces()) {
         avoidClashesWithNestedClasses(superinterface);
@@ -790,7 +795,7 @@ public final class TypeSpec {
         if (kind == Kind.INTERFACE || kind == Kind.ANNOTATION) {
           requireExactlyOneOf(fieldSpec.modifiers, Modifier.PUBLIC, Modifier.PRIVATE);
           Set<Modifier> check = EnumSet.of(Modifier.STATIC, Modifier.FINAL);
-          checkState(fieldSpec.modifiers.containsAll(check), "%s %s.%s requires modifiers %s",
+          checkState(fieldSpec.modifiers.containsAll(check), REQUIRES_MODIFIERS_FORMAT,
               kind, name, fieldSpec.name, check);
         }
       }
@@ -809,7 +814,7 @@ public final class TypeSpec {
           }
         } else if (kind == Kind.ANNOTATION) {
           checkState(methodSpec.modifiers.equals(kind.implicitMethodModifiers),
-              "%s %s.%s requires modifiers %s",
+                  REQUIRES_MODIFIERS_FORMAT,
               kind, name, methodSpec.name, kind.implicitMethodModifiers);
         }
         if (kind != Kind.ANNOTATION) {
@@ -824,7 +829,7 @@ public final class TypeSpec {
 
       for (TypeSpec typeSpec : typeSpecs) {
         checkArgument(typeSpec.modifiers.containsAll(kind.implicitTypeModifiers),
-            "%s %s.%s requires modifiers %s", kind, name, typeSpec.name,
+                REQUIRES_MODIFIERS_FORMAT, kind, name, typeSpec.name,
             kind.implicitTypeModifiers);
       }
 

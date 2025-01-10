@@ -8,6 +8,8 @@ import javax.lang.model.element.Modifier;
 import java.io.IOException;
 import java.io.StringWriter;
 
+import static org.junit.Assert.assertEquals;
+
 public class AnnotationIntegrationTest {
 
     //Test the integration of AnnotationSpec with TypeSpec and JavaFile
@@ -28,21 +30,11 @@ public class AnnotationIntegrationTest {
         StringWriter stringWriter = new StringWriter();
         javaFile.writeTo(stringWriter);
         String actualOutput = stringWriter.toString();
-        String expectedOutput = "package com.example.helloworld;\n\n"
-                + "import java.lang.Deprecated;\n"
-                + "import java.lang.Override;\n"
-                + "import java.lang.String;\n"
-                + "import java.lang.System;\n\n"
-                + "@Deprecated(\n"
-                + "    since = \"1.0\",\n"
-                + "    forRemoval = true\n"
-                + ")\n"
-                + "public final class HelloWorld {\n"
-                + "  @Override\n"
-                + "  public static void main(String[] args) {\n"
-                + "    System.out.println(\"Hello World\");\n"
-                + "  }\n"
+        String expectedOutput = "package com.example;\n\n"
+                + "import java.lang.SuppressWarnings;\n\n"
+                + "@SuppressWarnings(\"unchecked\")\n"
+                + "public class TestClass {\n"
                 + "}\n";
-
+        assertEquals(expectedOutput, actualOutput);
     }
 }

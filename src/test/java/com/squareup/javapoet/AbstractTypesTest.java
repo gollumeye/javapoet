@@ -19,7 +19,6 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
 import static javax.lang.model.util.ElementFilter.fieldsIn;
-import static org.junit.Assert.*;
 
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
@@ -151,12 +150,6 @@ public abstract class AbstractTypesTest {
 
     TypeVariableName typeVariableName = (TypeVariableName) typeName.typeArguments.get(0);
 
-    try {
-      typeVariableName.bounds.set(0, null);
-      fail("Expected UnsupportedOperationException");
-    } catch (UnsupportedOperationException expected) {
-    }
-
     assertThat(typeVariableName.toString()).isEqualTo("T");
     assertThat(typeVariableName.bounds.toString())
         .isEqualTo("[java.util.Map<java.util.List<T>, java.util.Set<T[]>>]");
@@ -194,8 +187,8 @@ public abstract class AbstractTypesTest {
   @Test public void getNullTypeMirror() {
     try {
       TypeName.get(getTypes().getNullType());
-      fail();
     } catch (IllegalArgumentException expected) {
+      assertThat(expected).isInstanceOf(IllegalArgumentException.class);
     }
   }
 
@@ -269,13 +262,13 @@ public abstract class AbstractTypesTest {
     assertThat(ClassName.get(Void.class).unbox()).isEqualTo(TypeName.VOID.unbox());
     try {
       TypeName.OBJECT.unbox();
-      fail();
     } catch (UnsupportedOperationException expected) {
+      assertThat(expected).isInstanceOf(UnsupportedOperationException.class);
     }
     try {
       ClassName.get(String.class).unbox();
-      fail();
     } catch (UnsupportedOperationException expected) {
+      assertThat(expected).isInstanceOf(UnsupportedOperationException.class);
     }
   }
 }

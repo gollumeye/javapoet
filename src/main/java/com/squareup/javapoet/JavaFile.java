@@ -173,10 +173,7 @@ public final class JavaFile {
     try (Writer writer = filerSourceFile.openWriter()) {
       writeTo(writer);
     } catch (Exception e) {
-      try {
-        filerSourceFile.delete();
-      } catch (Exception ignored) {
-      }
+      filerSourceFile.delete();
       throw e;
     }
   }
