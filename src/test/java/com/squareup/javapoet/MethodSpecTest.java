@@ -268,8 +268,8 @@ public final class MethodSpecTest {
             .addMethod(MethodSpec.overriding(fooElement).build())
             .build();
     JavaFileObject jfo = JavaFile.builder(implClassName.packageName, type).build().toJavaFileObject();
-    Compilation compilation = javac().compile(jfo);
-    assertThat(compilation).succeeded();
+    Compilation compile = javac().compile(jfo);
+    assertThat(compile).succeeded();
   }
 
   @Test public void equalsAndHashCode() {

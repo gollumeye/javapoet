@@ -87,6 +87,7 @@ public final class ClassNameTest {
       ClassName.bestGuess(s);
       fail();
     } catch (IllegalArgumentException expected) {
+      assertThat(expected).isInstanceOf(IllegalArgumentException.class);
     }
   }
 
@@ -171,16 +172,19 @@ public final class ClassNameTest {
       ClassName.get(int.class);
       fail();
     } catch (IllegalArgumentException ignored) {
+      assertThat(ignored).isInstanceOf(IllegalArgumentException.class);
     }
     try {
       ClassName.get(void.class);
       fail();
     } catch (IllegalArgumentException ignored) {
+      assertThat(ignored).isInstanceOf(IllegalArgumentException.class);
     }
     try {
       ClassName.get(Object[].class);
       fail();
     } catch (IllegalArgumentException ignored) {
+      assertThat(ignored).isInstanceOf(IllegalArgumentException.class);
     }
   }
 

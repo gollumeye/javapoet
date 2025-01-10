@@ -62,9 +62,10 @@ public final class ClassName extends TypeName implements Comparable<ClassName> {
     this.packageName = Objects.requireNonNull(packageName, "packageName == null");
     this.enclosingClassName = enclosingClassName;
     this.simpleName = simpleName;
+    String emptyPackageName = packageName.isEmpty() ? simpleName : packageName + '.' + simpleName;
     this.canonicalName = enclosingClassName != null
         ? (enclosingClassName.canonicalName + '.' + simpleName)
-        : (packageName.isEmpty() ? simpleName : packageName + '.' + simpleName);
+        : emptyPackageName;
   }
 
   @Override public ClassName annotated(List<AnnotationSpec> annotations) {
@@ -110,9 +111,10 @@ public final class ClassName extends TypeName implements Comparable<ClassName> {
 
   /** Return the binary name of a class. */
   public String reflectionName() {
+    String emptyClassName = packageName.isEmpty() ? simpleName : packageName + '.' + simpleName;
     return enclosingClassName != null
         ? (enclosingClassName.reflectionName() + '$' + simpleName)
-        : (packageName.isEmpty() ? simpleName : packageName + '.' + simpleName);
+        : emptyClassName;
   }
 
   public List<String> simpleNames() {
@@ -167,10 +169,10 @@ public final class ClassName extends TypeName implements Comparable<ClassName> {
     checkArgument(!void.class.equals(clazz), "'void' type cannot be represented as a ClassName");
     checkArgument(!clazz.isArray(), "array types cannot be represented as a ClassName");
 
-    String anonymousSuffix = "";
+    StringBuilder anonymousSuffix = new StringBuilder();
     while (clazz.isAnonymousClass()) {
       int lastDollar = clazz.getName().lastIndexOf('$');
-      anonymousSuffix = clazz.getName().substring(lastDollar) + anonymousSuffix;
+      anonymousSuffix.insert(0, clazz.getName().substring(lastDollar));
       clazz = clazz.getEnclosingClass();
     }
     String name = clazz.getSimpleName() + anonymousSuffix;
@@ -257,11 +259,11 @@ public final class ClassName extends TypeName implements Comparable<ClassName> {
   public CodeWriter emit(CodeWriter out) throws IOException {
     boolean charsEmitted = false;
     for (ClassName className : enclosingClasses()) {
-      String simpleName;
+      String actualName;
       if (charsEmitted) {
         // We've already emitted an enclosing class. Emit as we go.
         out.emit(".");
-        simpleName = className.simpleName;
+        actualName = className.simpleName;
 
       } else if (className.isAnnotated() || className == this) {
         // We encountered the first enclosing class that must be emitted.
@@ -269,10 +271,10 @@ public final class ClassName extends TypeName implements Comparable<ClassName> {
         int dot = qualifiedName.lastIndexOf('.');
         if (dot != -1) {
           out.emitAndIndent(qualifiedName.substring(0, dot + 1));
-          simpleName = qualifiedName.substring(dot + 1);
+          actualName = qualifiedName.substring(dot + 1);
           charsEmitted = true;
         } else {
-          simpleName = qualifiedName;
+          actualName = qualifiedName;
         }
 
       } else {
@@ -285,7 +287,7 @@ public final class ClassName extends TypeName implements Comparable<ClassName> {
         className.emitAnnotations(out);
       }
 
-      out.emit(simpleName);
+      out.emit(actualName);
       charsEmitted = true;
     }
 

@@ -106,7 +106,7 @@ public final class CodeWriter {
   }
 
   public CodeWriter pushPackage(String packageName) {
-    checkState(this.packageName == NO_PACKAGE, "package already set: %s", this.packageName);
+    checkState(this.packageName.equals(NO_PACKAGE), "package already set: %s", this.packageName);
     this.packageName = checkNotNull(packageName, "packageName == null");
     return this;
   }
@@ -249,9 +249,9 @@ public final class CodeWriter {
           out.zeroWidthSpace(indentationManager.getIndentLevel() + 2);
           break;
         default:
-          Boolean handled = handleDeferredTypeName(deferredTypeName, part);
+          boolean handled = handleDeferredTypeName(deferredTypeName, part);
           deferredTypeName = null;
-          if (Boolean.TRUE.equals(handled)) {
+          if (handled) {
             break;
           }
           emitAndIndent(part);
@@ -271,14 +271,13 @@ public final class CodeWriter {
   private ClassName emitTypeName(CodeBlock codeBlock, int a, ListIterator<String> partIterator,
                                  ClassName deferredTypeName) throws IOException {
     TypeName typeName = (TypeName) codeBlock.args.get(a);
-    if (typeName instanceof ClassName && partIterator.hasNext()) {
-      if (!codeBlock.formatParts.get(partIterator.nextIndex()).startsWith("$")) {
+  if (typeName instanceof ClassName && partIterator.hasNext()
+          && !codeBlock.formatParts.get(partIterator.nextIndex()).startsWith("$")) {
         ClassName candidate = (ClassName) typeName;
         if (staticImportManager.getStaticImportClassNames().contains(candidate.canonicalName)) {
           checkState(deferredTypeName == null, "pending type for static import?!");
           return candidate;
         }
-      }
     }
     typeName.emit(this);
     return null;
@@ -297,17 +296,15 @@ public final class CodeWriter {
     statementLine = -1;
   }
 
-  private Boolean handleDeferredTypeName(ClassName deferredTypeName, String part) throws IOException {
+  private boolean handleDeferredTypeName(ClassName deferredTypeName, String part) throws IOException {
     if (deferredTypeName != null) {
-      if (part.startsWith(".")) {
-        if (staticImportManager.contains(deferredTypeName.canonicalName, part)) {
+    if (part.startsWith(".") && staticImportManager.contains(deferredTypeName.canonicalName, part)) {
           emitAndIndent(part.substring(1));
           return true;
-        }
       }
       deferredTypeName.emit(this);
     }
-    return null;
+    return false;
   }
 
   public CodeWriter emitWrappingSpace() throws IOException {
@@ -361,9 +358,7 @@ public final class CodeWriter {
   }
 
   private void importableType(ClassName className) {
-    if (className.packageName().isEmpty()) {
-      return;
-    } else if (alwaysQualify.contains(className.simpleName)) {
+    if (className.packageName().isEmpty() || alwaysQualify.contains(className.simpleName)) {
       return;
     }
     ClassName topLevelClassName = className.topLevelClassName();
@@ -400,42 +395,46 @@ public final class CodeWriter {
     return className.nestedClass(simpleName);
   }
 
+  private void emitLineBreak() throws IOException {
+    if ((javadoc || comment) && trailingNewline) {
+      emitIndentation();
+      out.append(javadoc ? " *" : "//");
+    }
+    out.append("\n");
+    trailingNewline = true;
+    if (statementLine != -1) {
+      if (statementLine == 0) {
+        indent(2);
+      }
+      statementLine++;
+    }
+  }
+
+  private void emitLineContent(String line) throws IOException {
+    if (trailingNewline) {
+      emitIndentation();
+      if (javadoc) {
+        out.append(" * ");
+      } else if (comment) {
+        out.append("// ");
+      }
+    }
+    out.append(line);
+    trailingNewline = false;
+  }
+
   public CodeWriter emitAndIndent(String s) throws IOException {
     boolean first = true;
     for (String line : LINE_BREAKING_PATTERN.split(s, -1)) {
       if (!first) {
-        if ((javadoc || comment) && trailingNewline) {
-          emitIndentation();
-          out.append(javadoc ? " *" : "//");
-        }
-        out.append("\n");
-        trailingNewline = true;
-        if (statementLine != -1) {
-          if (statementLine == 0) {
-            indent(2);
-          }
-          statementLine++;
-        }
+        emitLineBreak();
       }
-
       first = false;
       if (line.isEmpty()) continue;
-
-      if (trailingNewline) {
-        emitIndentation();
-        if (javadoc) {
-          out.append(" * ");
-        } else if (comment) {
-          out.append("// ");
-        }
-      }
-
-      out.append(line);
-      trailingNewline = false;
+      emitLineContent(line);
     }
     return this;
   }
-
   private void emitIndentation() throws IOException {
     for (int j = 0; j < indentationManager.getIndentLevel(); j++) {
       out.append(indentationManager.getIndent());
