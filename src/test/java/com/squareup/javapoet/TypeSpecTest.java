@@ -49,7 +49,7 @@ import static org.junit.Assert.fail;
 @RunWith(JUnit4.class)
 public final class TypeSpecTest {
   private final String tacosPackage = "com.squareup.tacos";
-  private static final String donutsPackage = "com.squareup.donuts";
+  private static final String DONUTS_PACKAGE = "com.squareup.donuts";
 
   @Rule public final CompilationRule compilation = new CompilationRule();
 
@@ -57,7 +57,7 @@ public final class TypeSpecTest {
     return compilation.getElements().getTypeElement(clazz.getCanonicalName());
   }
 
-  @Test public void basic() throws Exception {
+  @Test public void basic() {
     TypeSpec taco = TypeSpec.classBuilder("Taco")
         .addMethod(MethodSpec.methodBuilder("toString")
             .addAnnotation(Override.class)
@@ -81,7 +81,7 @@ public final class TypeSpecTest {
     assertEquals(472949424, taco.hashCode()); // update expected number if source changes
   }
 
-  @Test public void interestingTypes() throws Exception {
+  @Test public void interestingTypes() {
     TypeName listOfAny = ParameterizedTypeName.get(
         ClassName.get(List.class), WildcardTypeName.subtypeOf(Object.class));
     TypeName listOfExtends = ParameterizedTypeName.get(
@@ -109,7 +109,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void anonymousInnerClass() throws Exception {
+  @Test public void anonymousInnerClass() {
     ClassName foo = ClassName.get(tacosPackage, "Foo");
     ClassName bar = ClassName.get(tacosPackage, "Bar");
     ClassName thingThang = ClassName.get(tacosPackage, "Thing", "Thang");
@@ -169,7 +169,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void annotatedParameters() throws Exception {
+  @Test public void annotatedParameters() {
     TypeSpec service = TypeSpec.classBuilder("Foo")
         .addMethod(MethodSpec.constructorBuilder()
             .addModifiers(Modifier.PUBLIC)
@@ -209,7 +209,7 @@ public final class TypeSpecTest {
    * We had a bug where annotations were preventing us from doing the right thing when resolving
    * imports. https://github.com/square/javapoet/issues/422
    */
-  @Test public void annotationsAndJavaLangTypes() throws Exception {
+  @Test public void annotationsAndJavaLangTypes() {
     ClassName freeRange = ClassName.get("javax.annotation", "FreeRange");
     TypeSpec taco = TypeSpec.classBuilder("EthicalTaco")
         .addField(ClassName.get(String.class)
@@ -227,7 +227,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void retrofitStyleInterface() throws Exception {
+  @Test public void retrofitStyleInterface() {
     ClassName observable = ClassName.get(tacosPackage, "Observable");
     ClassName fooBar = ClassName.get(tacosPackage, "FooBar");
     ClassName thing = ClassName.get(tacosPackage, "Thing");
@@ -285,7 +285,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void annotatedField() throws Exception {
+  @Test public void annotatedField() {
     TypeSpec taco = TypeSpec.classBuilder("Taco")
         .addField(FieldSpec.builder(String.class, "thing", Modifier.PRIVATE, Modifier.FINAL)
             .addAnnotation(AnnotationSpec.builder(ClassName.get(tacosPackage, "JsonAdapter"))
@@ -304,7 +304,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void annotatedClass() throws Exception {
+  @Test public void annotatedClass() {
     ClassName someType = ClassName.get(tacosPackage, "SomeType");
     TypeSpec taco = TypeSpec.classBuilder("Foo")
         .addAnnotation(AnnotationSpec.builder(ClassName.get(tacosPackage, "Something"))
@@ -347,7 +347,7 @@ public final class TypeSpecTest {
     }
   }
 
-  @Test public void enumWithSubclassing() throws Exception {
+  @Test public void enumWithSubclassing() {
     TypeSpec roshambo = TypeSpec.enumBuilder("Roshambo")
         .addModifiers(Modifier.PUBLIC)
         .addEnumConstant("ROCK", TypeSpec.anonymousClassBuilder("")
@@ -406,7 +406,7 @@ public final class TypeSpecTest {
   }
 
   /** https://github.com/square/javapoet/issues/193 */
-  @Test public void enumsMayDefineAbstractMethods() throws Exception {
+  @Test public void enumsMayDefineAbstractMethods() {
     TypeSpec roshambo = TypeSpec.enumBuilder("Tortilla")
         .addModifiers(Modifier.PUBLIC)
         .addEnumConstant("CORN", TypeSpec.anonymousClassBuilder("")
@@ -435,7 +435,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void noEnumConstants() throws Exception {
+  @Test public void noEnumConstants() {
     TypeSpec roshambo = TypeSpec.enumBuilder("Roshambo")
             .addField(String.class, "NO_ENUM", Modifier.STATIC)
             .build();
@@ -450,7 +450,7 @@ public final class TypeSpecTest {
             + "}\n");
   }
 
-  @Test public void onlyEnumsMayHaveEnumConstants() throws Exception {
+  @Test public void onlyEnumsMayHaveEnumConstants() {
     try {
       TypeSpec.classBuilder("Roshambo")
           .addEnumConstant("ROCK")
@@ -460,7 +460,7 @@ public final class TypeSpecTest {
     }
   }
 
-  @Test public void enumWithMembersButNoConstructorCall() throws Exception {
+  @Test public void enumWithMembersButNoConstructorCall() {
     TypeSpec roshambo = TypeSpec.enumBuilder("Roshambo")
         .addEnumConstant("SPOCK", TypeSpec.anonymousClassBuilder("")
             .addMethod(MethodSpec.methodBuilder("toString")
@@ -488,7 +488,7 @@ public final class TypeSpecTest {
   }
 
   /** https://github.com/square/javapoet/issues/253 */
-  @Test public void enumWithAnnotatedValues() throws Exception {
+  @Test public void enumWithAnnotatedValues() {
     TypeSpec roshambo = TypeSpec.enumBuilder("Roshambo")
         .addModifiers(Modifier.PUBLIC)
         .addEnumConstant("ROCK", TypeSpec.anonymousClassBuilder("")
@@ -512,7 +512,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void methodThrows() throws Exception {
+  @Test public void methodThrows() {
     TypeSpec taco = TypeSpec.classBuilder("Taco")
         .addModifiers(Modifier.ABSTRACT)
         .addMethod(MethodSpec.methodBuilder("throwOne")
@@ -549,7 +549,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void typeVariables() throws Exception {
+  @Test public void typeVariables() {
     TypeVariableName t = TypeVariableName.get("T");
     TypeVariableName p = TypeVariableName.get("P", Number.class);
     ClassName location = ClassName.get(tacosPackage, "Location");
@@ -627,7 +627,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void classImplementsExtends() throws Exception {
+  @Test public void classImplementsExtends() {
     ClassName taco = ClassName.get(tacosPackage, "Taco");
     ClassName food = ClassName.get("com.squareup.tacos", "Food");
     TypeSpec typeSpec = TypeSpec.classBuilder("Taco")
@@ -648,7 +648,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void classImplementsNestedClass() throws Exception {
+  @Test public void classImplementsNestedClass() {
     ClassName outer = ClassName.get(tacosPackage, "Outer");
     ClassName inner = outer.nestedClass("Inner");
     ClassName callable = ClassName.get(Callable.class);
@@ -671,7 +671,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void enumImplements() throws Exception {
+  @Test public void enumImplements() {
     TypeSpec typeSpec = TypeSpec.enumBuilder("Food")
         .addSuperinterface(Serializable.class)
         .addSuperinterface(Cloneable.class)
@@ -691,7 +691,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void interfaceExtends() throws Exception {
+  @Test public void interfaceExtends() {
     ClassName taco = ClassName.get(tacosPackage, "Taco");
     TypeSpec typeSpec = TypeSpec.interfaceBuilder("Taco")
         .addSuperinterface(Serializable.class)
@@ -707,7 +707,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void nestedClasses() throws Exception {
+  @Test public void nestedClasses() {
     ClassName taco = ClassName.get(tacosPackage, "Combo", "Taco");
     ClassName topping = ClassName.get(tacosPackage, "Combo", "Taco", "Topping");
     ClassName chips = ClassName.get(tacosPackage, "Combo", "Chips");
@@ -780,7 +780,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void annotation() throws Exception {
+  @Test public void annotation() {
     TypeSpec annotation = TypeSpec.annotationBuilder("MyAnnotation")
         .addModifiers(Modifier.PUBLIC)
         .addMethod(MethodSpec.methodBuilder("test")
@@ -799,7 +799,7 @@ public final class TypeSpecTest {
     );
   }
 
-  @Test public void innerAnnotationInAnnotationDeclaration() throws Exception {
+  @Test public void innerAnnotationInAnnotationDeclaration() {
     TypeSpec bar = TypeSpec.annotationBuilder("Bar")
         .addMethod(MethodSpec.methodBuilder("value")
             .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
@@ -839,7 +839,7 @@ public final class TypeSpecTest {
   }
 
   @Test
-  public void classCannotHaveDefaultValueForMethod() throws Exception {
+  public void classCannotHaveDefaultValueForMethod() {
     try {
       TypeSpec.classBuilder("Tacos")
           .addMethod(MethodSpec.methodBuilder("test")
@@ -854,7 +854,7 @@ public final class TypeSpecTest {
   }
 
   @Test
-  public void classCannotHaveDefaultMethods() throws Exception {
+  public void classCannotHaveDefaultMethods() {
     try {
       TypeSpec.classBuilder("Tacos")
           .addMethod(MethodSpec.methodBuilder("test")
@@ -869,7 +869,7 @@ public final class TypeSpecTest {
   }
 
   @Test
-  public void interfaceStaticMethods() throws Exception {
+  public void interfaceStaticMethods() {
     TypeSpec bar = TypeSpec.interfaceBuilder("Tacos")
         .addMethod(MethodSpec.methodBuilder("test")
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
@@ -890,7 +890,7 @@ public final class TypeSpecTest {
   }
 
   @Test
-  public void interfaceDefaultMethods() throws Exception {
+  public void interfaceDefaultMethods() {
     TypeSpec bar = TypeSpec.interfaceBuilder("Tacos")
         .addMethod(MethodSpec.methodBuilder("test")
             .addModifiers(Modifier.PUBLIC, Modifier.DEFAULT)
@@ -987,15 +987,15 @@ public final class TypeSpecTest {
     );
   }
 
-  @Test public void referencedAndDeclaredSimpleNamesConflict() throws Exception {
+  @Test public void referencedAndDeclaredSimpleNamesConflict() {
     FieldSpec internalTop = FieldSpec.builder(
         ClassName.get(tacosPackage, "Top"), "internalTop").build();
     FieldSpec internalBottom = FieldSpec.builder(
         ClassName.get(tacosPackage, "Top", "Middle", "Bottom"), "internalBottom").build();
     FieldSpec externalTop = FieldSpec.builder(
-        ClassName.get(donutsPackage, "Top"), "externalTop").build();
+        ClassName.get(DONUTS_PACKAGE, "Top"), "externalTop").build();
     FieldSpec externalBottom = FieldSpec.builder(
-        ClassName.get(donutsPackage, "Bottom"), "externalBottom").build();
+        ClassName.get(DONUTS_PACKAGE, "Bottom"), "externalBottom").build();
     TypeSpec top = TypeSpec.classBuilder("Top")
         .addField(internalTop)
         .addField(internalBottom)
@@ -1050,11 +1050,11 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void simpleNamesConflictInThisAndOtherPackage() throws Exception {
+  @Test public void simpleNamesConflictInThisAndOtherPackage() {
     FieldSpec internalOther = FieldSpec.builder(
         ClassName.get(tacosPackage, "Other"), "internalOther").build();
     FieldSpec externalOther = FieldSpec.builder(
-        ClassName.get(donutsPackage, "Other"), "externalOther").build();
+        ClassName.get(DONUTS_PACKAGE, "Other"), "externalOther").build();
     TypeSpec gen = TypeSpec.classBuilder("Gen")
         .addField(internalOther)
         .addField(externalOther)
@@ -1226,7 +1226,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void annotationsInAnnotations() throws Exception {
+  @Test public void annotationsInAnnotations() {
     ClassName beef = ClassName.get(tacosPackage, "Beef");
     ClassName chicken = ClassName.get(tacosPackage, "Chicken");
     ClassName option = ClassName.get(tacosPackage, "Option");
@@ -1258,7 +1258,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void varargs() throws Exception {
+  @Test public void varargs() {
     TypeSpec taqueria = TypeSpec.classBuilder("Taqueria")
         .addMethod(MethodSpec.methodBuilder("prepare")
             .addParameter(int.class, "workers")
@@ -1277,7 +1277,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void codeBlocks() throws Exception {
+  @Test public void codeBlocks() {
     CodeBlock ifBlock = CodeBlock.builder()
         .beginControlFlow("if (!a.equals(b))")
         .addStatement("return i")
@@ -1348,7 +1348,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void indexedElseIf() throws Exception {
+  @Test public void indexedElseIf() {
     TypeSpec taco = TypeSpec.classBuilder("Taco")
         .addMethod(MethodSpec.methodBuilder("choices")
             .beginControlFlow("if ($1L != null || $1L == $2L)", "taco", "otherTaco")
@@ -1374,7 +1374,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void elseIf() throws Exception {
+  @Test public void elseIf() {
     TypeSpec taco = TypeSpec.classBuilder("Taco")
         .addMethod(MethodSpec.methodBuilder("choices")
             .beginControlFlow("if (5 < 4) ")
@@ -1400,7 +1400,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void doWhile() throws Exception {
+  @Test public void doWhile() {
     TypeSpec taco = TypeSpec.classBuilder("Taco")
         .addMethod(MethodSpec.methodBuilder("loopForever")
             .beginControlFlow("do")
@@ -1422,7 +1422,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void inlineIndent() throws Exception {
+  @Test public void inlineIndent() {
     TypeSpec taco = TypeSpec.classBuilder("Taco")
         .addMethod(MethodSpec.methodBuilder("inlineIndent")
             .addCode("if (3 < 4) {\n$>$T.out.println($S);\n$<}\n", System.class, "hello")
@@ -1442,7 +1442,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void defaultModifiersForInterfaceMembers() throws Exception {
+  @Test public void defaultModifiersForInterfaceMembers() {
     TypeSpec taco = TypeSpec.interfaceBuilder("Taco")
         .addField(FieldSpec.builder(String.class, "SHELL")
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
@@ -1470,7 +1470,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void defaultModifiersForMemberInterfacesAndEnums() throws Exception {
+  @Test public void defaultModifiersForMemberInterfacesAndEnums() {
     TypeSpec taco = TypeSpec.classBuilder("Taco")
         .addType(TypeSpec.classBuilder("Meat")
             .addModifiers(Modifier.STATIC)
@@ -1499,7 +1499,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void membersOrdering() throws Exception {
+  @Test public void membersOrdering() {
     // Hand out names in reverse-alphabetical order to defend against unexpected sorting.
     TypeSpec taco = TypeSpec.classBuilder("Members")
         .addType(TypeSpec.classBuilder("Z").build())
@@ -1556,7 +1556,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void nativeMethods() throws Exception {
+  @Test public void nativeMethods() {
     TypeSpec taco = TypeSpec.classBuilder("Taco")
         .addMethod(MethodSpec.methodBuilder("nativeInt")
             .addModifiers(Modifier.NATIVE)
@@ -1589,7 +1589,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void nullStringLiteral() throws Exception {
+  @Test public void nullStringLiteral() {
     TypeSpec taco = TypeSpec.classBuilder("Taco")
         .addField(FieldSpec.builder(String.class, "NULL")
             .initializer("$S", (Object) null)
@@ -1605,27 +1605,27 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void annotationToString() throws Exception {
+  @Test public void annotationToString() {
     AnnotationSpec annotation = AnnotationSpec.builder(SuppressWarnings.class)
         .addMember("value", "$S", "unused")
         .build();
     assertThat(annotation.toString()).isEqualTo("@java.lang.SuppressWarnings(\"unused\")");
   }
 
-  @Test public void codeBlockToString() throws Exception {
+  @Test public void codeBlockToString() {
     CodeBlock codeBlock = CodeBlock.builder()
         .addStatement("$T $N = $S.substring(0, 3)", String.class, "s", "taco")
         .build();
     assertThat(codeBlock.toString()).isEqualTo("java.lang.String s = \"taco\".substring(0, 3);\n");
   }
 
-  @Test public void codeBlockAddStatementOfCodeBlockToString() throws Exception {
+  @Test public void codeBlockAddStatementOfCodeBlockToString() {
     CodeBlock contents = CodeBlock.of("$T $N = $S.substring(0, 3)", String.class, "s", "taco");
     CodeBlock statement = CodeBlock.builder().addStatement(contents).build();
     assertThat(statement.toString()).isEqualTo("java.lang.String s = \"taco\".substring(0, 3);\n");
   }
 
-  @Test public void fieldToString() throws Exception {
+  @Test public void fieldToString() {
     FieldSpec field = FieldSpec.builder(String.class, "s", Modifier.FINAL)
         .initializer("$S.substring(0, 3)", "taco")
         .build();
@@ -1633,7 +1633,7 @@ public final class TypeSpecTest {
         .isEqualTo("final java.lang.String s = \"taco\".substring(0, 3);\n");
   }
 
-  @Test public void methodToString() throws Exception {
+  @Test public void methodToString() {
     MethodSpec method = MethodSpec.methodBuilder("toString")
         .addAnnotation(Override.class)
         .addModifiers(Modifier.PUBLIC)
@@ -1647,7 +1647,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void constructorToString() throws Exception {
+  @Test public void constructorToString() {
     MethodSpec constructor = MethodSpec.constructorBuilder()
         .addModifiers(Modifier.PUBLIC)
         .addParameter(ClassName.get(tacosPackage, "Taco"), "taco")
@@ -1659,7 +1659,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void parameterToString() throws Exception {
+  @Test public void parameterToString() {
     ParameterSpec parameter = ParameterSpec.builder(ClassName.get(tacosPackage, "Taco"), "taco")
         .addModifiers(Modifier.FINAL)
         .addAnnotation(ClassName.get("javax.annotation", "Nullable"))
@@ -1668,7 +1668,7 @@ public final class TypeSpecTest {
         .isEqualTo("@javax.annotation.Nullable final com.squareup.tacos.Taco taco");
   }
 
-  @Test public void classToString() throws Exception {
+  @Test public void classToString() {
     TypeSpec type = TypeSpec.classBuilder("Taco")
         .build();
     assertThat(type.toString()).isEqualTo(""
@@ -1676,7 +1676,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void anonymousClassToString() throws Exception {
+  @Test public void anonymousClassToString() {
     TypeSpec type = TypeSpec.anonymousClassBuilder("")
         .addSuperinterface(Runnable.class)
         .addMethod(MethodSpec.methodBuilder("run")
@@ -1692,7 +1692,7 @@ public final class TypeSpecTest {
         + "}");
   }
 
-  @Test public void interfaceClassToString() throws Exception {
+  @Test public void interfaceClassToString() {
     TypeSpec type = TypeSpec.interfaceBuilder("Taco")
         .build();
     assertThat(type.toString()).isEqualTo(""
@@ -1700,7 +1700,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void annotationDeclarationToString() throws Exception {
+  @Test public void annotationDeclarationToString() {
     TypeSpec type = TypeSpec.annotationBuilder("Taco")
         .build();
     assertThat(type.toString()).isEqualTo(""
@@ -1712,7 +1712,7 @@ public final class TypeSpecTest {
     return JavaFile.builder(tacosPackage, typeSpec).build().toString();
   }
 
-  @Test public void multilineStatement() throws Exception {
+  @Test public void multilineStatement() {
     TypeSpec taco = TypeSpec.classBuilder("Taco")
         .addMethod(MethodSpec.methodBuilder("toString")
             .addAnnotation(Override.class)
@@ -1740,7 +1740,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void multilineStatementWithAnonymousClass() throws Exception {
+  @Test public void multilineStatementWithAnonymousClass() {
     TypeName stringComparator = ParameterizedTypeName.get(Comparator.class, String.class);
     TypeName listOfString = ParameterizedTypeName.get(List.class, String.class);
     TypeSpec prefixComparator = TypeSpec.anonymousClassBuilder("")
@@ -1801,7 +1801,7 @@ public final class TypeSpecTest {
         + "}\n");
   }
 
-  @Test public void multilineStrings() throws Exception {
+  @Test public void multilineStrings() {
     TypeSpec taco = TypeSpec.classBuilder("Taco")
         .addField(FieldSpec.builder(String.class, "toppings")
             .initializer("$S", "shell\nbeef\nlettuce\ncheese\n")

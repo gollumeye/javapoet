@@ -29,9 +29,9 @@ import static org.junit.Assert.assertTrue;
 
 public class AnnotatedTypeNameTest {
 
-  private final static String NN = NeverNull.class.getCanonicalName();
+  private static final String NN = NeverNull.class.getCanonicalName();
   private final AnnotationSpec NEVER_NULL = AnnotationSpec.builder(NeverNull.class).build();
-  private final static String TUA = TypeUseAnnotation.class.getCanonicalName();
+  private static final String TUA = TypeUseAnnotation.class.getCanonicalName();
   private final AnnotationSpec TYPE_USE_ANNOTATION =
       AnnotationSpec.builder(TypeUseAnnotation.class).build();
 
