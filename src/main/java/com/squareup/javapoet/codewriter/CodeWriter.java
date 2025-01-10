@@ -192,7 +192,7 @@ public final class CodeWriter {
     emit(">");
   }
 
-  public void popTypeVariables(List<TypeVariableName> typeVariables) throws IOException {
+  public void popTypeVariables(List<TypeVariableName> typeVariables) {
     typeVariables.forEach(typeVariable -> currentTypeVariables.remove(typeVariable.name));
   }
 
@@ -382,7 +382,7 @@ public final class CodeWriter {
       }
     }
 
-    if (typeSpecStack.size() > 0 && Objects.equals(typeSpecStack.get(0).name, simpleName)) {
+    if (!typeSpecStack.isEmpty() && Objects.equals(typeSpecStack.get(0).name, simpleName)) {
       return ClassName.get(packageName, simpleName);
     }
 

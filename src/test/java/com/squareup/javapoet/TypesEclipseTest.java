@@ -127,7 +127,7 @@ public final class TypesEclipseTest extends AbstractTypesTest {
       return types;
     }
 
-    static private boolean compile(Iterable<? extends Processor> processors) {
+    private static boolean compile(Iterable<? extends Processor> processors) {
       JavaCompiler compiler = new EclipseCompiler();
       DiagnosticCollector<JavaFileObject> diagnosticCollector =
           new DiagnosticCollector<>();

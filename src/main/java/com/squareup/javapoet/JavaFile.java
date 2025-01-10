@@ -202,7 +202,6 @@ public final class JavaFile {
 
     int importedTypesCount = 0;
     for (ClassName className : new TreeSet<>(codeWriter.importedTypes().values())) {
-      // TODO what about nested types like java.util.Map.Entry?
       if (skipJavaLangImports
           && className.packageName().equals("java.lang")
           && !alwaysQualify.contains(className.simpleName)) {
