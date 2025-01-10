@@ -237,7 +237,6 @@ public class TypeName implements TypeNameProvider {
     return result;
   }
 
-  @Override
   public CodeWriter emit(CodeWriter out) throws IOException {
     if (keyword == null) throw new AssertionError();
 
