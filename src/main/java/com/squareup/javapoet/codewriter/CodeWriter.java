@@ -271,7 +271,8 @@ public final class CodeWriter {
   private ClassName emitTypeName(CodeBlock codeBlock, int a, ListIterator<String> partIterator,
                                  ClassName deferredTypeName) throws IOException {
     TypeName typeName = (TypeName) codeBlock.args.get(a);
-  if (typeName instanceof ClassName && partIterator.hasNext() && !codeBlock.formatParts.get(partIterator.nextIndex()).startsWith("$")) {
+  if (typeName instanceof ClassName && partIterator.hasNext()
+          && !codeBlock.formatParts.get(partIterator.nextIndex()).startsWith("$")) {
         ClassName candidate = (ClassName) typeName;
         if (staticImportManager.getStaticImportClassNames().contains(candidate.canonicalName)) {
           checkState(deferredTypeName == null, "pending type for static import?!");

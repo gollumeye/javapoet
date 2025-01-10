@@ -83,7 +83,8 @@ public final class MethodSpec {
             && TYPE_NAME_STATIC_ADAPTER.asArray((parameters.get(parameters.size() - 1).type)) != null;
   }
 
-  private void emitMethodSignature(CodeWriter codeWriter, String enclosingName, Set<Modifier> implicitModifiers) throws IOException {
+  private void emitMethodSignature(CodeWriter codeWriter, String enclosingName,
+                                   Set<Modifier> implicitModifiers) throws IOException {
     codeWriter.emitJavadoc(javadocWithParameters());
     codeWriter.emitAnnotations(annotations, false);
     codeWriter.emitModifiers(modifiers, implicitModifiers);
