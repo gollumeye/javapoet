@@ -26,7 +26,6 @@ import org.junit.Test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 
 public class TypeNameTest {
@@ -162,7 +161,7 @@ public class TypeNameTest {
         WildcardTypeName.supertypeOf(String.class));
   }
 
-  @Test public void isPrimitive() throws Exception {
+  @Test public void isPrimitive() {
     assertThat(TypeName.INT.isPrimitive()).isTrue();
     assertThat(ClassName.get("java.lang", "Integer").isPrimitive()).isFalse();
     assertThat(ClassName.get("java.lang", "String").isPrimitive()).isFalse();
@@ -170,7 +169,7 @@ public class TypeNameTest {
     assertThat(ClassName.get("java.lang", "Void").isPrimitive()).isFalse();
   }
 
-  @Test public void isBoxedPrimitive() throws Exception {
+  @Test public void isBoxedPrimitive() {
     assertThat(TypeName.INT.isBoxedPrimitive()).isFalse();
     assertThat(ClassName.get("java.lang", "Integer").isBoxedPrimitive()).isTrue();
     assertThat(ClassName.get("java.lang", "String").isBoxedPrimitive()).isFalse();
@@ -180,12 +179,12 @@ public class TypeNameTest {
             .annotated(ANNOTATION_SPEC).isBoxedPrimitive()).isTrue();
   }
 
-  @Test public void canBoxAnnotatedPrimitive() throws Exception {
+  @Test public void canBoxAnnotatedPrimitive() {
     assertThat(TypeName.BOOLEAN.annotated(ANNOTATION_SPEC).box()).isEqualTo(
             ClassName.get("java.lang", "Boolean").annotated(ANNOTATION_SPEC));
   }
 
-  @Test public void canUnboxAnnotatedPrimitive() throws Exception {
+  @Test public void canUnboxAnnotatedPrimitive() {
     assertThat(ClassName.get("java.lang", "Boolean").annotated(ANNOTATION_SPEC)
             .unbox()).isEqualTo(TypeName.BOOLEAN.annotated(ANNOTATION_SPEC));
   }
@@ -194,6 +193,6 @@ public class TypeNameTest {
     assertEquals(a.toString(), b.toString());
     assertThat(a.equals(b)).isTrue();
     assertThat(a.hashCode()).isEqualTo(b.hashCode());
-    assertFalse(a.equals(null));
+    assertNotEquals(null, a);
   }
 }

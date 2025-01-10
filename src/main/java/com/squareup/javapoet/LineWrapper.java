@@ -28,6 +28,7 @@ public final class LineWrapper {
   private final String indent;
   private final int columnLimit;
   private boolean closed;
+  private static final String CLOSED_MESSAGE = "closed";
 
   /** Characters written since the last wrapping space that haven't yet been flushed. */
   private final StringBuilder buffer = new StringBuilder();
@@ -59,7 +60,7 @@ public final class LineWrapper {
 
   /** Emit {@code s}. This may be buffered to permit line wraps to be inserted. */
   public void append(String s) throws IOException {
-    if (closed) throw new IllegalStateException("closed");
+    if (closed) throw new IllegalStateException(CLOSED_MESSAGE);
 
     if (nextFlush != null) {
       int nextNewline = s.indexOf('\n');
@@ -86,7 +87,7 @@ public final class LineWrapper {
 
   /** Emit either a space or a newline character. */
   public void wrappingSpace(int indentLevel) throws IOException {
-    if (closed) throw new IllegalStateException("closed");
+    if (closed) throw new IllegalStateException(CLOSED_MESSAGE);
 
     if (this.nextFlush != null) flush(nextFlush);
     column++; // Increment the column even though the space is deferred to next call to flush().
@@ -96,7 +97,7 @@ public final class LineWrapper {
 
   /** Emit a newline character if the line will exceed it's limit, otherwise do nothing. */
   public void zeroWidthSpace(int indentLevel) throws IOException {
-    if (closed) throw new IllegalStateException("closed");
+    if (closed) throw new IllegalStateException(CLOSED_MESSAGE);
 
     if (column == 0) return;
     if (this.nextFlush != null) flush(nextFlush);

@@ -68,6 +68,7 @@ import javax.lang.model.util.SimpleTypeVisitor8;
  * ParameterizedTypeName}, {@link TypeVariableName}, and {@link WildcardTypeName}.
  */
 public class TypeName implements TypeNameProvider {
+  private static final String JAVA_LANG = "java.lang";
   public static final TypeName VOID = new TypeName("void");
   public static final TypeName BOOLEAN = new TypeName("boolean");
   public static final TypeName BYTE = new TypeName("byte");
@@ -77,17 +78,17 @@ public class TypeName implements TypeNameProvider {
   public static final TypeName CHAR = new TypeName("char");
   public static final TypeName FLOAT = new TypeName("float");
   public static final TypeName DOUBLE = new TypeName("double");
-  public static final ClassName OBJECT = ClassName.get("java.lang", "Object");
+  public static final ClassName OBJECT = ClassName.get(JAVA_LANG, "Object");
 
-  private static final ClassName BOXED_VOID = ClassName.get("java.lang", "Void");
-  private static final ClassName BOXED_BOOLEAN = ClassName.get("java.lang", "Boolean");
-  private static final ClassName BOXED_BYTE = ClassName.get("java.lang", "Byte");
-  private static final ClassName BOXED_SHORT = ClassName.get("java.lang", "Short");
-  private static final ClassName BOXED_INT = ClassName.get("java.lang", "Integer");
-  private static final ClassName BOXED_LONG = ClassName.get("java.lang", "Long");
-  private static final ClassName BOXED_CHAR = ClassName.get("java.lang", "Character");
-  private static final ClassName BOXED_FLOAT = ClassName.get("java.lang", "Float");
-  private static final ClassName BOXED_DOUBLE = ClassName.get("java.lang", "Double");
+  private static final ClassName BOXED_VOID = ClassName.get(JAVA_LANG, "Void");
+  private static final ClassName BOXED_BOOLEAN = ClassName.get(JAVA_LANG, "Boolean");
+  private static final ClassName BOXED_BYTE = ClassName.get(JAVA_LANG, "Byte");
+  private static final ClassName BOXED_SHORT = ClassName.get(JAVA_LANG, "Short");
+  private static final ClassName BOXED_INT = ClassName.get(JAVA_LANG, "Integer");
+  private static final ClassName BOXED_LONG = ClassName.get(JAVA_LANG, "Long");
+  private static final ClassName BOXED_CHAR = ClassName.get(JAVA_LANG, "Character");
+  private static final ClassName BOXED_FLOAT = ClassName.get(JAVA_LANG, "Float");
+  private static final ClassName BOXED_DOUBLE = ClassName.get(JAVA_LANG, "Double");
 
   /** The name of this type if it is a keyword, or null. */
   private final String keyword;
@@ -342,34 +343,32 @@ public class TypeName implements TypeNameProvider {
 
   static TypeName get(Type type, Map<Type, TypeVariableName> map) {
     if (type instanceof Class<?>) {
-      Class<?> classType = (Class<?>) type;
-      if (type == void.class) return VOID;
-      if (type == boolean.class) return BOOLEAN;
-      if (type == byte.class) return BYTE;
-      if (type == short.class) return SHORT;
-      if (type == int.class) return INT;
-      if (type == long.class) return LONG;
-      if (type == char.class) return CHAR;
-      if (type == float.class) return FLOAT;
-      if (type == double.class) return DOUBLE;
-      if (classType.isArray()) return ArrayTypeName.of(get(classType.getComponentType(), map));
-      return ClassName.get(classType);
-
+      return getClassType((Class<?>) type, map);
     } else if (type instanceof ParameterizedType) {
       return ParameterizedTypeName.get((ParameterizedType) type, map);
-
     } else if (type instanceof WildcardType) {
       return WildcardTypeName.get((WildcardType) type, map);
-
     } else if (type instanceof TypeVariable<?>) {
       return TypeVariableName.get((TypeVariable<?>) type, map);
-
     } else if (type instanceof GenericArrayType) {
       return ArrayTypeName.get((GenericArrayType) type, map);
-
     } else {
       throw new IllegalArgumentException("unexpected type: " + type);
     }
+  }
+
+  private static TypeName getClassType(Class<?> classType, Map<Type, TypeVariableName> map) {
+    if (classType == void.class) return VOID;
+    if (classType == boolean.class) return BOOLEAN;
+    if (classType == byte.class) return BYTE;
+    if (classType == short.class) return SHORT;
+    if (classType == int.class) return INT;
+    if (classType == long.class) return LONG;
+    if (classType == char.class) return CHAR;
+    if (classType == float.class) return FLOAT;
+    if (classType == double.class) return DOUBLE;
+    if (classType.isArray()) return ArrayTypeName.of(get(classType.getComponentType(), map));
+    return ClassName.get(classType);
   }
 
   /** Converts an array of types to a list of type names. */

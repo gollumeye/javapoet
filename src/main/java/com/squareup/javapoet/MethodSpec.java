@@ -59,8 +59,8 @@ public final class MethodSpec {
   public final CodeBlock defaultValue;
 
   private MethodSpec(Builder builder) {
-    CodeBlock code = builder.code.build();
-    checkArgument(code.isEmpty() || !builder.modifiers.contains(Modifier.ABSTRACT),
+    CodeBlock block = builder.code.build();
+    checkArgument(block.isEmpty() || !builder.modifiers.contains(Modifier.ABSTRACT),
         "abstract method %s cannot have code", builder.name);
     checkArgument(!builder.varargs || lastParameterIsArray(builder.parameters),
         "last parameter of varargs method %s must be an array", builder.name);
@@ -75,7 +75,7 @@ public final class MethodSpec {
     this.varargs = builder.varargs;
     this.exceptions = Util.immutableList(builder.exceptions);
     this.defaultValue = builder.defaultValue;
-    this.code = code;
+    this.code = block;
   }
 
   private boolean lastParameterIsArray(List<ParameterSpec> parameters) {
@@ -83,8 +83,8 @@ public final class MethodSpec {
             && TYPE_NAME_STATIC_ADAPTER.asArray((parameters.get(parameters.size() - 1).type)) != null;
   }
 
-  void emit(CodeWriter codeWriter, String enclosingName, Set<Modifier> implicitModifiers)
-      throws IOException {
+  private void emitMethodSignature(CodeWriter codeWriter, String enclosingName,
+                                   Set<Modifier> implicitModifiers) throws IOException {
     codeWriter.emitJavadoc(javadocWithParameters());
     codeWriter.emitAnnotations(annotations, false);
     codeWriter.emitModifiers(modifiers, implicitModifiers);
@@ -100,14 +100,7 @@ public final class MethodSpec {
       codeWriter.emit("$T $L($Z", typeNameProvider, name);
     }
 
-    boolean firstParameter = true;
-    for (Iterator<ParameterSpec> i = parameters.iterator(); i.hasNext(); ) {
-      ParameterSpec parameter = i.next();
-      if (!firstParameter) codeWriter.emit(",").emitWrappingSpace();
-      parameter.emit(codeWriter, !i.hasNext() && varargs);
-      firstParameter = false;
-    }
-
+    emitParameters(codeWriter);
     codeWriter.emit(")");
 
     if (defaultValue != null && !defaultValue.isEmpty()) {
@@ -115,6 +108,20 @@ public final class MethodSpec {
       codeWriter.emit(defaultValue);
     }
 
+    emitExceptions(codeWriter);
+  }
+
+  private void emitParameters(CodeWriter codeWriter) throws IOException {
+    boolean firstParameter = true;
+    for (Iterator<ParameterSpec> i = parameters.iterator(); i.hasNext(); ) {
+      ParameterSpec parameter = i.next();
+      if (!firstParameter) codeWriter.emit(",").emitWrappingSpace();
+      parameter.emit(codeWriter, !i.hasNext() && varargs);
+      firstParameter = false;
+    }
+  }
+
+  private void emitExceptions(CodeWriter codeWriter) throws IOException {
     if (!exceptions.isEmpty()) {
       codeWriter.emitWrappingSpace().emit("throws");
       boolean firstException = true;
@@ -124,22 +131,26 @@ public final class MethodSpec {
         firstException = false;
       }
     }
+  }
 
+  private void emitMethodBody(CodeWriter codeWriter) throws IOException {
     if (hasModifier(Modifier.ABSTRACT)) {
       codeWriter.emit(";\n");
     } else if (hasModifier(Modifier.NATIVE)) {
-      // Code is allowed to support stuff like GWT JSNI.
       codeWriter.emit(code);
       codeWriter.emit(";\n");
     } else {
       codeWriter.emit(" {\n");
-
       codeWriter.indent();
       codeWriter.emit(code, true);
       codeWriter.unindent();
-
       codeWriter.emit("}\n");
     }
+  }
+
+  void emit(CodeWriter codeWriter, String enclosingName, Set<Modifier> implicitModifiers) throws IOException {
+    emitMethodSignature(codeWriter, enclosingName, implicitModifiers);
+    emitMethodBody(codeWriter);
     codeWriter.popTypeVariables(typeVariables);
   }
 
@@ -230,8 +241,8 @@ public final class MethodSpec {
     methodBuilder.addModifiers(modifiers);
 
     for (TypeParameterElement typeParameterElement : method.getTypeParameters()) {
-      TypeVariable var = (TypeVariable) typeParameterElement.asType();
-      methodBuilder.addTypeVariable(TypeVariableName.get(var));
+      TypeVariable typeParameterElementType = (TypeVariable) typeParameterElement.asType();
+      methodBuilder.addTypeVariable(TypeVariableName.get(typeParameterElementType));
     }
 
     methodBuilder.returns(TYPE_NAME_STATIC_ADAPTER.get(method.getReturnType()));

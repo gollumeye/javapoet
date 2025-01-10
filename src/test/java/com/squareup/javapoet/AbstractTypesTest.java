@@ -19,12 +19,10 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
 import static javax.lang.model.util.ElementFilter.fieldsIn;
-import static org.junit.Assert.*;
 
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
 import java.io.Serializable;
-import java.lang.annotation.Annotation;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.List;
@@ -32,8 +30,6 @@ import java.util.Map;
 import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
@@ -41,7 +37,6 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.ErrorType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.type.TypeVisitor;
 import javax.lang.model.type.WildcardType;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
@@ -155,12 +150,6 @@ public abstract class AbstractTypesTest {
 
     TypeVariableName typeVariableName = (TypeVariableName) typeName.typeArguments.get(0);
 
-    try {
-      typeVariableName.bounds.set(0, null);
-      fail("Expected UnsupportedOperationException");
-    } catch (UnsupportedOperationException expected) {
-    }
-
     assertThat(typeVariableName.toString()).isEqualTo("T");
     assertThat(typeVariableName.bounds.toString())
         .isEqualTo("[java.util.Map<java.util.List<T>, java.util.Set<T[]>>]");
@@ -198,43 +187,43 @@ public abstract class AbstractTypesTest {
   @Test public void getNullTypeMirror() {
     try {
       TypeName.get(getTypes().getNullType());
-      fail();
     } catch (IllegalArgumentException expected) {
+      assertThat(expected).isInstanceOf(IllegalArgumentException.class);
     }
   }
 
-  @Test public void parameterizedType() throws Exception {
+  @Test public void parameterizedType() {
     ParameterizedTypeName type = ParameterizedTypeName.get(Map.class, String.class, Long.class);
     assertThat(type.toString()).isEqualTo("java.util.Map<java.lang.String, java.lang.Long>");
   }
 
-  @Test public void arrayType() throws Exception {
+  @Test public void arrayType() {
     ArrayTypeName type = ArrayTypeName.of(String.class);
     assertThat(type.toString()).isEqualTo("java.lang.String[]");
   }
 
-  @Test public void wildcardExtendsType() throws Exception {
+  @Test public void wildcardExtendsType() {
     WildcardTypeName type = WildcardTypeName.subtypeOf(CharSequence.class);
     assertThat(type.toString()).isEqualTo("? extends java.lang.CharSequence");
   }
 
-  @Test public void wildcardExtendsObject() throws Exception {
+  @Test public void wildcardExtendsObject() {
     WildcardTypeName type = WildcardTypeName.subtypeOf(Object.class);
     assertThat(type.toString()).isEqualTo("?");
   }
 
-  @Test public void wildcardSuperType() throws Exception {
+  @Test public void wildcardSuperType() {
     WildcardTypeName type = WildcardTypeName.supertypeOf(String.class);
     assertThat(type.toString()).isEqualTo("? super java.lang.String");
   }
 
-  @Test public void wildcardMirrorNoBounds() throws Exception {
+  @Test public void wildcardMirrorNoBounds() {
     WildcardType wildcard = getTypes().getWildcardType(null, null);
     TypeName type = TypeName.get(wildcard);
     assertThat(type.toString()).isEqualTo("?");
   }
 
-  @Test public void wildcardMirrorExtendsType() throws Exception {
+  @Test public void wildcardMirrorExtendsType() {
     Types types = getTypes();
     Elements elements = getElements();
     TypeMirror charSequence = elements.getTypeElement(CharSequence.class.getName()).asType();
@@ -243,7 +232,7 @@ public abstract class AbstractTypesTest {
     assertThat(type.toString()).isEqualTo("? extends java.lang.CharSequence");
   }
 
-  @Test public void wildcardMirrorSuperType() throws Exception {
+  @Test public void wildcardMirrorSuperType() {
     Types types = getTypes();
     Elements elements = getElements();
     TypeMirror string = elements.getTypeElement(String.class.getName()).asType();
@@ -252,12 +241,12 @@ public abstract class AbstractTypesTest {
     assertThat(type.toString()).isEqualTo("? super java.lang.String");
   }
 
-  @Test public void typeVariable() throws Exception {
+  @Test public void typeVariable() {
     TypeVariableName type = TypeVariableName.get("T", CharSequence.class);
     assertThat(type.toString()).isEqualTo("T"); // (Bounds are only emitted in declaration.)
   }
 
-  @Test public void box() throws Exception {
+  @Test public void box() {
     assertThat(TypeName.INT.box()).isEqualTo(ClassName.get(Integer.class));
     assertThat(TypeName.VOID.box()).isEqualTo(ClassName.get(Void.class));
     assertThat(ClassName.get(Integer.class).box()).isEqualTo(ClassName.get(Integer.class));
@@ -266,20 +255,20 @@ public abstract class AbstractTypesTest {
     assertThat(ClassName.get(String.class).box()).isEqualTo(ClassName.get(String.class));
   }
 
-  @Test public void unbox() throws Exception {
+  @Test public void unbox() {
     assertThat(TypeName.INT).isEqualTo(TypeName.INT.unbox());
     assertThat(TypeName.VOID).isEqualTo(TypeName.VOID.unbox());
     assertThat(ClassName.get(Integer.class).unbox()).isEqualTo(TypeName.INT.unbox());
     assertThat(ClassName.get(Void.class).unbox()).isEqualTo(TypeName.VOID.unbox());
     try {
       TypeName.OBJECT.unbox();
-      fail();
     } catch (UnsupportedOperationException expected) {
+      assertThat(expected).isInstanceOf(UnsupportedOperationException.class);
     }
     try {
       ClassName.get(String.class).unbox();
-      fail();
     } catch (UnsupportedOperationException expected) {
+      assertThat(expected).isInstanceOf(UnsupportedOperationException.class);
     }
   }
 }

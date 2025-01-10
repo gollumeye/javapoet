@@ -173,10 +173,7 @@ public final class JavaFile {
     try (Writer writer = filerSourceFile.openWriter()) {
       writeTo(writer);
     } catch (Exception e) {
-      try {
-        filerSourceFile.delete();
-      } catch (Exception ignored) {
-      }
+      filerSourceFile.delete();
       throw e;
     }
   }
@@ -202,7 +199,6 @@ public final class JavaFile {
 
     int importedTypesCount = 0;
     for (ClassName className : new TreeSet<>(codeWriter.importedTypes().values())) {
-      // TODO what about nested types like java.util.Map.Entry?
       if (skipJavaLangImports
           && className.packageName().equals("java.lang")
           && !alwaysQualify.contains(className.simpleName)) {

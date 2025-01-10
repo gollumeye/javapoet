@@ -29,10 +29,10 @@ import static org.junit.Assert.assertTrue;
 
 public class AnnotatedTypeNameTest {
 
-  private final static String NN = NeverNull.class.getCanonicalName();
-  private final AnnotationSpec NEVER_NULL = AnnotationSpec.builder(NeverNull.class).build();
-  private final static String TUA = TypeUseAnnotation.class.getCanonicalName();
-  private final AnnotationSpec TYPE_USE_ANNOTATION =
+  private static final String NN = NeverNull.class.getCanonicalName();
+  private static final AnnotationSpec NEVER_NULL = AnnotationSpec.builder(NeverNull.class).build();
+  private static final String TUA = TypeUseAnnotation.class.getCanonicalName();
+  private static final AnnotationSpec TYPE_USE_ANNOTATION =
       AnnotationSpec.builder(TypeUseAnnotation.class).build();
 
   @Target(ElementType.TYPE_USE)
@@ -110,7 +110,6 @@ public class AnnotatedTypeNameTest {
 
   private void annotatedEquivalence(TypeName type) {
     assertFalse(type.isAnnotated());
-    assertEquals(type, type);
     assertEquals(type.annotated(TYPE_USE_ANNOTATION), type.annotated(TYPE_USE_ANNOTATION));
     assertNotEquals(type, type.annotated(TYPE_USE_ANNOTATION));
     assertEquals(type.hashCode(), type.hashCode());

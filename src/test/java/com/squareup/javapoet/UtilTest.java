@@ -20,12 +20,14 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 public class UtilTest {
-  @Test public void characterLiteral() {
+  @Test public void characterLiteralBasic() {
     assertEquals("a", Util.characterLiteralWithoutSingleQuotes('a'));
     assertEquals("b", Util.characterLiteralWithoutSingleQuotes('b'));
     assertEquals("c", Util.characterLiteralWithoutSingleQuotes('c'));
     assertEquals("%", Util.characterLiteralWithoutSingleQuotes('%'));
-    // common escapes
+  }
+
+  @Test public void characterLiteralCommonEscapes() {
     assertEquals("\\b", Util.characterLiteralWithoutSingleQuotes('\b'));
     assertEquals("\\t", Util.characterLiteralWithoutSingleQuotes('\t'));
     assertEquals("\\n", Util.characterLiteralWithoutSingleQuotes('\n'));
@@ -34,14 +36,18 @@ public class UtilTest {
     assertEquals("\"", Util.characterLiteralWithoutSingleQuotes('"'));
     assertEquals("\\'", Util.characterLiteralWithoutSingleQuotes('\''));
     assertEquals("\\\\", Util.characterLiteralWithoutSingleQuotes('\\'));
-    // octal escapes
+  }
+
+  @Test public void characterLiteralOctalEscapes() {
     assertEquals("\\u0000", Util.characterLiteralWithoutSingleQuotes('\0'));
     assertEquals("\\u0007", Util.characterLiteralWithoutSingleQuotes('\7'));
     assertEquals("?", Util.characterLiteralWithoutSingleQuotes('\77'));
     assertEquals("\\u007f", Util.characterLiteralWithoutSingleQuotes('\177'));
     assertEquals("¿", Util.characterLiteralWithoutSingleQuotes('\277'));
     assertEquals("ÿ", Util.characterLiteralWithoutSingleQuotes('\377'));
-    // unicode escapes
+  }
+
+  @Test public void characterLiteralUnicodeEscapes() {
     assertEquals("\\u0000", Util.characterLiteralWithoutSingleQuotes('\u0000'));
     assertEquals("\\u0001", Util.characterLiteralWithoutSingleQuotes('\u0001'));
     assertEquals("\\u0002", Util.characterLiteralWithoutSingleQuotes('\u0002'));

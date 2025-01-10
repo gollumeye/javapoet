@@ -256,7 +256,7 @@ public final class JavaFileTest {
     return TypeSpec.classBuilder(name).addMethod(method).build();
 
   }
-  @Test public void noImports() throws Exception {
+  @Test public void noImports() {
     String source = JavaFile.builder("com.squareup.tacos",
         TypeSpec.classBuilder("Taco").build())
         .build()
@@ -268,7 +268,7 @@ public final class JavaFileTest {
         + "}\n");
   }
 
-  @Test public void singleImport() throws Exception {
+  @Test public void singleImport() {
     String source = JavaFile.builder("com.squareup.tacos",
         TypeSpec.classBuilder("Taco")
             .addField(Date.class, "madeFreshDate")
@@ -285,7 +285,7 @@ public final class JavaFileTest {
         + "}\n");
   }
 
-  @Test public void conflictingImports() throws Exception {
+  @Test public void conflictingImports() {
     String source = JavaFile.builder("com.squareup.tacos",
         TypeSpec.classBuilder("Taco")
             .addField(Date.class, "madeFreshDate")
@@ -305,7 +305,7 @@ public final class JavaFileTest {
         + "}\n");
   }
 
-  @Test public void annotatedTypeParam() throws Exception {
+  @Test public void annotatedTypeParam() {
     String source = JavaFile.builder("com.squareup.tacos",
         TypeSpec.classBuilder("Taco")
             .addField(ParameterizedTypeName.get(ClassName.get(List.class),
@@ -326,7 +326,7 @@ public final class JavaFileTest {
         + "}\n");
   }
 
-  @Test public void skipJavaLangImportsWithConflictingClassLast() throws Exception {
+  @Test public void skipJavaLangImportsWithConflictingClassLast() {
     // Whatever is used first wins! In this case the Float in java.lang is imported.
     String source = JavaFile.builder("com.squareup.tacos",
         TypeSpec.classBuilder("Taco")
@@ -346,7 +346,7 @@ public final class JavaFileTest {
         + "}\n");
   }
 
-  @Test public void skipJavaLangImportsWithConflictingClassFirst() throws Exception {
+  @Test public void skipJavaLangImportsWithConflictingClassFirst() {
     // Whatever is used first wins! In this case the Float in com.squareup.soda is imported.
     String source = JavaFile.builder("com.squareup.tacos",
         TypeSpec.classBuilder("Taco")
@@ -368,7 +368,7 @@ public final class JavaFileTest {
         + "}\n");
   }
 
-  @Test public void conflictingParentName() throws Exception {
+  @Test public void conflictingParentName() {
     String source = JavaFile.builder("com.squareup.tacos",
         TypeSpec.classBuilder("A")
             .addType(TypeSpec.classBuilder("B")
@@ -404,7 +404,7 @@ public final class JavaFileTest {
         + "}\n");
   }
 
-  @Test public void conflictingChildName() throws Exception {
+  @Test public void conflictingChildName() {
     String source = JavaFile.builder("com.squareup.tacos",
         TypeSpec.classBuilder("A")
             .addType(TypeSpec.classBuilder("B")
@@ -440,7 +440,7 @@ public final class JavaFileTest {
         + "}\n");
   }
 
-  @Test public void conflictingNameOutOfScope() throws Exception {
+  @Test public void conflictingNameOutOfScope() {
     String source = JavaFile.builder("com.squareup.tacos",
         TypeSpec.classBuilder("A")
             .addType(TypeSpec.classBuilder("B")
@@ -480,7 +480,7 @@ public final class JavaFileTest {
         + "}\n");
   }
 
-  @Test public void nestedClassAndSuperclassShareName() throws Exception {
+  @Test public void nestedClassAndSuperclassShareName() {
     String source = JavaFile.builder("com.squareup.tacos",
         TypeSpec.classBuilder("Taco")
             .superclass(ClassName.get("com.squareup.wire", "Message"))
@@ -501,7 +501,7 @@ public final class JavaFileTest {
         + "}\n");
   }
 
-  @Test public void classAndSuperclassShareName() throws Exception {
+  @Test public void classAndSuperclassShareName() {
     String source = JavaFile.builder("com.squareup.tacos",
         TypeSpec.classBuilder("Taco")
             .superclass(ClassName.get("com.taco.bell", "Taco"))
@@ -515,7 +515,7 @@ public final class JavaFileTest {
         + "}\n");
   }
 
-  @Test public void conflictingAnnotation() throws Exception {
+  @Test public void conflictingAnnotation() {
     String source = JavaFile.builder("com.squareup.tacos",
         TypeSpec.classBuilder("Taco")
             .addAnnotation(ClassName.get("com.taco.bell", "Taco"))
@@ -530,7 +530,7 @@ public final class JavaFileTest {
         + "}\n");
   }
 
-  @Test public void conflictingAnnotationReferencedClass() throws Exception {
+  @Test public void conflictingAnnotationReferencedClass() {
     String source = JavaFile.builder("com.squareup.tacos",
         TypeSpec.classBuilder("Taco")
             .addAnnotation(AnnotationSpec.builder(ClassName.get("com.squareup.tacos", "MyAnno"))
@@ -547,7 +547,7 @@ public final class JavaFileTest {
         + "}\n");
   }
 
-  @Test public void conflictingTypeVariableBound() throws Exception {
+  @Test public void conflictingTypeVariableBound() {
     String source = JavaFile.builder("com.squareup.tacos",
         TypeSpec.classBuilder("Taco")
             .addTypeVariable(
@@ -562,7 +562,7 @@ public final class JavaFileTest {
         + "}\n");
   }
 
-  @Test public void superclassReferencesSelf() throws Exception {
+  @Test public void superclassReferencesSelf() {
     String source = JavaFile.builder("com.squareup.tacos",
         TypeSpec.classBuilder("Taco")
             .superclass(ParameterizedTypeName.get(
@@ -580,7 +580,7 @@ public final class JavaFileTest {
   }
 
   /** https://github.com/square/javapoet/issues/366 */
-  @Test public void annotationIsNestedClass() throws Exception {
+  @Test public void annotationIsNestedClass() {
     String source = JavaFile.builder("com.squareup.tacos",
         TypeSpec.classBuilder("TestComponent")
             .addAnnotation(ClassName.get("dagger", "Component"))
@@ -603,7 +603,7 @@ public final class JavaFileTest {
         + "}\n");
   }
 
-  @Test public void defaultPackage() throws Exception {
+  @Test public void defaultPackage() {
     String source = JavaFile.builder("",
         TypeSpec.classBuilder("HelloWorld")
             .addMethod(MethodSpec.methodBuilder("main")
@@ -625,7 +625,7 @@ public final class JavaFileTest {
         + "}\n");
   }
 
-  @Test public void defaultPackageTypesAreNotImported() throws Exception {
+  @Test public void defaultPackageTypesAreNotImported() {
     String source = JavaFile.builder("hello",
           TypeSpec.classBuilder("World").addSuperinterface(ClassName.get("", "Test")).build())
         .build()
@@ -637,7 +637,7 @@ public final class JavaFileTest {
         + "}\n");
   }
 
-  @Test public void topOfFileComment() throws Exception {
+  @Test public void topOfFileComment() {
     String source = JavaFile.builder("com.squareup.tacos",
         TypeSpec.classBuilder("Taco").build())
         .addFileComment("Generated $L by JavaPoet. DO NOT EDIT!", "2015-01-13")
@@ -651,7 +651,7 @@ public final class JavaFileTest {
         + "}\n");
   }
 
-  @Test public void emptyLinesInTopOfFileComment() throws Exception {
+  @Test public void emptyLinesInTopOfFileComment() {
     String source = JavaFile.builder("com.squareup.tacos",
         TypeSpec.classBuilder("Taco").build())
         .addFileComment("\nGENERATED FILE:\n\nDO NOT EDIT!\n")
@@ -669,7 +669,7 @@ public final class JavaFileTest {
         + "}\n");
   }
 
-  @Test public void packageClassConflictsWithNestedClass() throws Exception {
+  @Test public void packageClassConflictsWithNestedClass() {
     String source = JavaFile.builder("com.squareup.tacos",
         TypeSpec.classBuilder("Taco")
             .addField(ClassName.get("com.squareup.tacos", "A"), "a")
@@ -688,7 +688,7 @@ public final class JavaFileTest {
         + "}\n");
   }
 
-  @Test public void packageClassConflictsWithSuperlass() throws Exception {
+  @Test public void packageClassConflictsWithSuperlass() {
     String source = JavaFile.builder("com.squareup.tacos",
         TypeSpec.classBuilder("Taco")
             .superclass(ClassName.get("com.taco.bell", "A"))
@@ -704,7 +704,7 @@ public final class JavaFileTest {
         + "}\n");
   }
 
-  @Test public void modifyStaticImports() throws Exception {
+  @Test public void modifyStaticImports() {
     JavaFile.Builder builder = JavaFile.builder("com.squareup.tacos",
         TypeSpec.classBuilder("Taco")
             .build())
