@@ -306,10 +306,9 @@ public final class MethodSpec {
     return builder;
   }
 
-  public static final class Builder {
+  public static final class Builder extends AbstractSpecBuilder<Builder, MethodSpec> {
     private String name;
 
-    private final CodeBlock.Builder javadoc = CodeBlock.builder();
     private TypeNameProvider returnType;
     private final Set<TypeNameProvider> exceptions = new LinkedHashSet<>();
     private final CodeBlock.Builder code = CodeBlock.builder();
@@ -317,8 +316,6 @@ public final class MethodSpec {
     private CodeBlock defaultValue;
 
     public final List<TypeVariableName> typeVariables = new ArrayList<>();
-    public final List<AnnotationSpec> annotations = new ArrayList<>();
-    public final List<Modifier> modifiers = new ArrayList<>();
     public final List<ParameterSpec> parameters = new ArrayList<>();
 
     private Builder(String name) {
@@ -334,32 +331,17 @@ public final class MethodSpec {
       return this;
     }
 
-    public Builder addJavadoc(String format, Object... args) {
-      javadoc.add(format, args);
-      return this;
-    }
-
-    public Builder addJavadoc(CodeBlock block) {
-      javadoc.add(block);
-      return this;
-    }
-
     public Builder addAnnotations(Iterable<AnnotationSpec> annotationSpecs) {
       checkArgument(annotationSpecs != null, "annotationSpecs == null");
-      for (AnnotationSpec annotationSpec : annotationSpecs) {
-        this.annotations.add(annotationSpec);
-      }
-      return this;
+      return super.addAnnotations(annotationSpecs);
     }
 
     public Builder addAnnotation(AnnotationSpec annotationSpec) {
-      this.annotations.add(annotationSpec);
-      return this;
+      return super.addAnnotation(annotationSpec);
     }
 
     public Builder addAnnotation(ClassName annotation) {
-      this.annotations.add(AnnotationSpec.builder(annotation).build());
-      return this;
+      return super.addAnnotation(annotation);
     }
 
     public Builder addAnnotation(Class<?> annotation) {
@@ -368,16 +350,12 @@ public final class MethodSpec {
 
     public Builder addModifiers(Modifier... modifiers) {
       checkNotNull(modifiers, "modifiers == null");
-      Collections.addAll(this.modifiers, modifiers);
-      return this;
+      return super.addModifiers(modifiers);
     }
 
     public Builder addModifiers(Iterable<Modifier> modifiers) {
       checkNotNull(modifiers, "modifiers == null");
-      for (Modifier modifier : modifiers) {
-        this.modifiers.add(modifier);
-      }
-      return this;
+      return super.addModifiers(modifiers);
     }
 
     public Builder addTypeVariables(Iterable<TypeVariableName> typeVariables) {
