@@ -20,7 +20,6 @@ import com.squareup.javapoet.codewriter.CodeWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import javax.lang.model.SourceVersion;
@@ -137,54 +136,18 @@ public final class ParameterSpec {
     return builder;
   }
 
-  public static final class Builder {
+  public static final class Builder extends AbstractSpecBuilder<Builder, ParameterSpec> {
     private final TypeNameProvider type;
     private final String name;
-    private final CodeBlock.Builder javadoc = CodeBlock.builder();
-
-    public final List<AnnotationSpec> annotations = new ArrayList<>();
-    public final List<Modifier> modifiers = new ArrayList<>();
 
     private Builder(TypeNameProvider type, String name) {
       this.type = type;
       this.name = name;
     }
 
-    public Builder addJavadoc(String format, Object... args) {
-      javadoc.add(format, args);
-      return this;
-    }
-
-    public Builder addJavadoc(CodeBlock block) {
-      javadoc.add(block);
-      return this;
-    }
-
     public Builder addAnnotations(Iterable<AnnotationSpec> annotationSpecs) {
       checkArgument(annotationSpecs != null, "annotationSpecs == null");
-      for (AnnotationSpec annotationSpec : annotationSpecs) {
-        this.annotations.add(annotationSpec);
-      }
-      return this;
-    }
-
-    public Builder addAnnotation(AnnotationSpec annotationSpec) {
-      this.annotations.add(annotationSpec);
-      return this;
-    }
-
-    public Builder addAnnotation(ClassName annotation) {
-      this.annotations.add(AnnotationSpec.builder(annotation).build());
-      return this;
-    }
-
-    public Builder addAnnotation(Class<?> annotation) {
-      return addAnnotation(ClassName.get(annotation));
-    }
-
-    public Builder addModifiers(Modifier... modifiers) {
-      Collections.addAll(this.modifiers, modifiers);
-      return this;
+      return super.addAnnotations(annotationSpecs);
     }
 
     public Builder addModifiers(Iterable<Modifier> modifiers) {

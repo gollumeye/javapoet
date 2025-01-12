@@ -413,19 +413,16 @@ public final class TypeSpec {
     }
   }
 
-  public static final class Builder {
+  public static final class Builder extends AbstractSpecBuilder<Builder, TypeSpec> {
     private final Kind kind;
     private final String name;
     private final CodeBlock anonymousTypeArguments;
 
-    private final CodeBlock.Builder javadoc = CodeBlock.builder();
     private TypeName superclass = ClassName.OBJECT;
     private final CodeBlock.Builder staticBlock = CodeBlock.builder();
     private final CodeBlock.Builder initializerBlock = CodeBlock.builder();
 
     public final Map<String, TypeSpec> enumConstants = new LinkedHashMap<>();
-    public final List<AnnotationSpec> annotations = new ArrayList<>();
-    public final List<Modifier> modifiers = new ArrayList<>();
     public final List<TypeVariableName> typeVariables = new ArrayList<>();
     public final List<TypeName> superinterfaces = new ArrayList<>();
     public final List<FieldSpec> fieldSpecs = new ArrayList<>();
@@ -444,42 +441,20 @@ public final class TypeSpec {
       this.anonymousTypeArguments = anonymousTypeArguments;
     }
 
-    public Builder addJavadoc(String format, Object... args) {
-      javadoc.add(format, args);
-      return this;
-    }
-
-    public Builder addJavadoc(CodeBlock block) {
-      javadoc.add(block);
-      return this;
-    }
-
     public Builder addAnnotations(Iterable<AnnotationSpec> annotationSpecs) {
       checkArgument(annotationSpecs != null, "annotationSpecs == null");
-      for (AnnotationSpec annotationSpec : annotationSpecs) {
-        this.annotations.add(annotationSpec);
-      }
-      return this;
+      return super.addAnnotations(annotationSpecs);
     }
 
     public Builder addAnnotation(AnnotationSpec annotationSpec) {
       checkNotNull(annotationSpec, "annotationSpec == null");
-      this.annotations.add(annotationSpec);
-      return this;
+      return super.addAnnotation(annotationSpec);
     }
 
     public Builder addAnnotation(ClassName annotation) {
       return addAnnotation(AnnotationSpec.builder(annotation).build());
     }
 
-    public Builder addAnnotation(Class<?> annotation) {
-      return addAnnotation(ClassName.get(annotation));
-    }
-
-    public Builder addModifiers(Modifier... modifiers) {
-      Collections.addAll(this.modifiers, modifiers);
-      return this;
-    }
 
     public Builder addTypeVariables(Iterable<TypeVariableName> typeVariables) {
       checkArgument(typeVariables != null, "typeVariables == null");
