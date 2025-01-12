@@ -354,25 +354,40 @@ public final class AnnotationSpecTest {
         + "}\n");
   }
 
-  @Test public void disallowsNullMemberName() {
-    AnnotationSpec.Builder builder = AnnotationSpec.builder(HasDefaultsAnnotation.class);
+  @Test
+  public void disallowsNullMemberName() {
+    assertThrowsWithMessage(
+            () -> {
+              AnnotationSpec.Builder builder = AnnotationSpec.builder(HasDefaultsAnnotation.class);
+              builder.addMember(null, "$L", "");
+            },
+            NullPointerException.class,
+            "name == null"
+    );
+  }
+
+  @Test
+  public void requiresValidMemberName() {
+    assertThrowsWithMessage(
+            () -> {
+              AnnotationSpec.Builder builder = AnnotationSpec.builder(HasDefaultsAnnotation.class);
+              builder.addMember("@", "$L", "");
+            },
+            IllegalArgumentException.class,
+            "not a valid name: @"
+    );
+  }
+
+  private void assertThrowsWithMessage(Runnable codeBlock, Class<? extends Throwable> exceptionClass, String expectedMessage) {
     try {
-      AnnotationSpec.Builder $L = builder.addMember(null, "$L", "");
-      fail($L.build().toString());
-    } catch (NullPointerException e) {
-      assertThat(e).hasMessageThat().isEqualTo("name == null");
+      codeBlock.run();
+      fail("Expected exception was not thrown");
+    } catch (Throwable e) {
+      assertThat(e).isInstanceOf(exceptionClass);
+      assertThat(e).hasMessageThat().isEqualTo(expectedMessage);
     }
   }
 
-  @Test public void requiresValidMemberName() {
-    AnnotationSpec.Builder builder = AnnotationSpec.builder(HasDefaultsAnnotation.class);
-    try {
-      AnnotationSpec.Builder $L = builder.addMember("@", "$L", "");
-      fail($L.build().toString());
-    } catch (IllegalArgumentException e) {
-      assertThat(e).hasMessageThat().isEqualTo("not a valid name: @");
-    }
-  }
 
   @Test public void modifyMembers() {
     AnnotationSpec.Builder builder = AnnotationSpec.builder(SuppressWarnings.class)
